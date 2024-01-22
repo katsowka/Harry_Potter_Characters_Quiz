@@ -1,7 +1,7 @@
 '''
-Harry Potter Characters Quiz
-
 main author: Katarzyna Sowka (katsowka)
+
+title: Harry Potter Characters Quiz
 
 based on final project of CFG Python and Apps Kickstarter course
 originally done in collaboration with Emma Jourzac (jourzy)
@@ -13,7 +13,7 @@ originally done in collaboration with Emma Jourzac (jourzy)
 
 import requests as rq
 import pandas as pd
-from pandas import json_normalize  # 'unravels' nested columns, like wand
+from pandas import json_normalize
 import numpy as np
 import random as rd
 import datetime
@@ -36,10 +36,6 @@ df = json_normalize(response)
 
 df.drop(columns=['id', 'dateOfBirth', 'yearOfBirth', 'eyeColour', 'hairColour'], inplace=True)
 
-### previous spot for df and df_remaining
-### now placed below cat values, but still not all fixed
-### species MC main problem, just get to errors!!
-
 species = [ x for x in df['species'].unique() if x != '']
 houses = [ x for x in df['house'].unique() if x != '']
 ancestries = [ x for x in df['ancestry'].unique() if x != '']
@@ -48,12 +44,10 @@ wand_woods = [ x for x in df['wand.wood'].unique() if x != '']
 wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 
 
-
-###### TEMOPORARY SHORT DF
+##### TEMOPORARY SHORT DF
 df = df.iloc[0:100]
 
 df_remaining = df.sample(frac=1)
-
 
 
 alts = df['alternate_names'].explode()
@@ -523,7 +517,7 @@ for question in questions:
 
     # standard questions
     else:
-        ### MC qs when df_remaining is low - Add Error returns!!
+        ### MC qs when df_remaining is low - Add Error return!!
         if len(df_remaining) < 10 and question in [MCqs]:
             print("df_remaining getting low for MC!=")
             break
@@ -566,33 +560,3 @@ print(end_text)
 with open('HPquiz_qs.txt', 'w') as file:
     file.write(qs_txt)
 
-
-
-# ----- OLD STUFF (not used)
-
-# --- examples of exploring dataframes
-# print(df.columns)
-# print(df.index)
-# print(df.dtypes)
-# print(df.head())
-# print(df.info())
-# print(df.describe())
-# print(df['species'].unique())
-# print(df['species'].value_counts())
-# print(df[df['wizard']==False]['patronus']) # patronus column of dataframe where wizard is False
-# print(df.at[3, 'patronus']=='') # unknown / missing patronus values are empty strings
-
-# --- trials of getting df
-# print(type(response)) -> list [of JSONS??
-# print(response[0])
-# print(type(response[0])) # -> dict
-
-# resp_j = json.dumps(response)
-
-# df = pd.DataFrame(response)
-# Xdf = pd.read_json(response, orient='records')
-# Xdf = pd.read_json(response.text)
-# Xdf = pd.read_json(str(response))
-
-# works but wand nested
-# df = pd.read_json(resp_j)
