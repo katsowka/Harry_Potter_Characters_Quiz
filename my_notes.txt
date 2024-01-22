@@ -4,3 +4,4 @@ QUESTIONS:
 
 TO DO:
 - add README and gitignore files
+- test making same project but starting from GitHub (HPquiz_pd_2)
