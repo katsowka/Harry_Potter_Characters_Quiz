@@ -1,7 +1,0 @@
-QUESTIONS:
-- where are my local git repositories stored? I don't see in project folders
-- can I have a difference gitignore file for local and remote repository of same project?
-
-TO DO:
-- add README and gitignore files
-- test making same project but starting from GitHub (HPquiz_pd_2)
