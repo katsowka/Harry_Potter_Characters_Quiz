@@ -1,3 +1,3 @@
-# Harry Potter Quiz
+# Harry Potter Characters Quiz
 
-repository originated in PyCharm
+project based on original HPquiz, this time using Pandas dataframes and adding multiple choice questions
