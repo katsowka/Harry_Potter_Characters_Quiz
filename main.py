@@ -1,3 +1,13 @@
+'''
+Harry Potter Characters Quiz
+
+main author: Katarzyna Sowka (katsowka)
+
+based on final project of CFG Python and Apps Kickstarter course
+originally done in collaboration with Emma Jourzac (jourzy)
+'''
+
+
 # ----- IMPORT LIBRARIES AND DATA
 
 
