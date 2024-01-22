@@ -1,19 +1,3 @@
-# ----- TO DO NEXT:
-'''
-- see Jupyter TO DO
-- add a 'correct' variable in TFs, so instead of T or F, it gives the correct 'answer'
-- MC questions when df_remaining low, alternate plans
-    including for when limiting df at start (for 'easy')
-    so cat_values should be full, but limit after?
-- funct returning 5, only using 3 now:
-    save all 5 or trim return?
-- make scores.csv file, with date
-- plan leaderboard:
-    - use pandas or numpy to sort
-    - is leaderboard.csv needed?
-
-'''
-
 # ----- IMPORT LIBRARIES AND DATA
 
 
