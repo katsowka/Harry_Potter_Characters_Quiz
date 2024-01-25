@@ -233,11 +233,12 @@ int (index 'ind' to remove from characters list, None if not removing one)
 
 # -- True or False (TF) types
 
+
 def is_student(df):
     """
     asks if a given character is a Hogwarts students, True or False
     :param df: dataframe
-    :return: [question, given, actual, check_ans(given, actual), ind]
+    :return: [question, given, actual, is_correct, ind]
     """
     char = df.iloc[0]
     ind = char.name
@@ -259,7 +260,7 @@ def is_staff(df):
     """
     asks if a given character is a Hogwarts staff member, True or False
     :param df: dataframe
-    :return: [question, given, actual, check_ans(given, actual), ind]
+    :return: [question, given, actual, is_correct, ind]
     """
     char = df.iloc[0]
     ind = char.name
@@ -277,7 +278,7 @@ def is_wizard(df):
     """
     asks if a given character is a wizard, True or False
     :param df: dataframe
-    :return: [question, given, actual, check_ans(given, actual), ind]
+    :return: [question, given, actual, is_correct, ind]
     """
     char = df.iloc[0]
     ind = char.name
@@ -295,7 +296,7 @@ def is_house(df):
     """
     asks if a given character belongs to a particular Hogwarts House, True or False
     :param df: dataframe
-    :return: [question, given, actual, check_ans(given, actual), ind]
+    :return: [question, given, actual, is_correct, ind]
     """
     char = find_opts(df, 'house', '', True).iloc[0]
     ind = char.name
@@ -315,7 +316,7 @@ def is_patronus(df):
     """
     asks if a given patronus belongs to a particular wizard, True or False
     :param df: dataframe
-    :return: [question, given, actual, check_ans(given, actual), 0]
+    :return: [question, given, actual, is_correct, ind]
     """
     char = find_opts(df, 'patronus', '', True).iloc[0]
     ind = char.name
@@ -335,7 +336,7 @@ def is_species(df):
     """
     asks if a given patronus belongs to a particular wizard, True or False
     :param df: dataframe
-    :return: [question, given, actual, check_ans(given, actual), 0]
+    :return: [question, given, actual, is_correct, ind]
     """
     char = df.iloc[0]
     ind = char.name
@@ -352,6 +353,12 @@ def is_species(df):
 
 
 def is_alt_name(df, alts):
+    """
+    asks if a given alternate name belongs to a particular wizard
+    :param df: dataframe of HP characters
+    :param alts: series of alternate names of HP characters
+    :return: [question, given, actual, is_correct, ind]
+    """
     # asks if a given alternate name is that of a particular character, True or False
     alt_name = alts.iloc[0]
     ind = alts.index[0]
@@ -370,6 +377,11 @@ def is_alt_name(df, alts):
 
 ### sample row of df returns df, need to use squeeze, better solution?
 def is_wand_wood(df):
+    """
+    asks if a particular wood is used in a given characters wand
+    :param df: dataframe of HP characters
+    :return: [question, given, actual, is_correct, ind]
+    """
     # asks if a given wood type is used in a particular wizard's wand, True or False
     char = find_opts(df, 'wand.wood', '', True).sample().squeeze()
     ind = char.name
@@ -385,9 +397,10 @@ def is_wand_wood(df):
 
     return [question, given, actual, is_correct, ind]
 
+
 # -- Multiple Choice (MC) types
 
-### MC_process returns 5, last two not used yet, so adding [0:3] to return
+### MC_process returns 5 items, last 2 not used yet, so adding [0:3] to return
 
 def MC_staff_1(df):
     """
