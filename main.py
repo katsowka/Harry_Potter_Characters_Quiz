@@ -1,12 +1,10 @@
 '''
 main author: Katarzyna Sowka (katsowka)
-
 title: Harry Potter Characters Quiz
 
 based on final project of CFG Python and Apps Kickstarter course
 originally done in collaboration with Emma Jourzac (jourzy)
 '''
-
 
 # ----- IMPORT LIBRARIES AND DATA
 
@@ -92,29 +90,38 @@ def ask_TF():
 
 
 def process_TF(actual):
+    """
+    asks user for their answer to TF question and determines if they are correct
+    :param actual: correct answer (bool)
+    :return:
+    given: answer provided by user (bool)
+    is_correct: bool stating whether given answer is correct
+    """
     given = ask_TF()
     is_correct = check_ans(given, actual)
-    return [given, is_correct]
+    return given, is_correct
 
 
 # -- Multiple Choice (MC) related
 
-''' go over these choices and consider changing
-ans: correct answer -> change to 'actual'?
-xyz: incorrect answers
-ANS: correct letter choice -> change/d to 'ACTUAL'?
+''' check these choices and consider changing
+actual: correct answer
+x, y, z: incorrect answers
+ACTUAL: correct letter choice
 ABCD: letter choices
 '''
 
 
 def mix_MC(actual, x, y, z):
     """
-    klxjhksj
-    :param actual:
-    :param x:
-    :param y:
-    :param z:
+    shuffles options for a multiple choice question
+    :param actual: correct answer (str)
+    :param x: wrong answer 1 (str)
+    :param y: wrong answer 2 (str)
+    :param z: wrong answer 3 (str)
     :return:
+    dict: dictionary with shuffled answers matched to letter options
+    ACTUAL: letter corresponding to correct answer
     """
     lst = [actual, x, y, z]
     rd.shuffle(lst)
@@ -126,13 +133,14 @@ def mix_MC(actual, x, y, z):
 
 def print_MC(q, a, b, c, d):
     """
-    kadjfhkasfh
-    :param q:
-    :param a:
-    :param b:
-    :param c:
-    :param d:
+    creates a formatted string for a multiple choice question
+    :param q: question being asked (str)
+    :param a: text for option A (str)
+    :param b: text for option B (str)
+    :param c: text for option C (str)
+    :param d: text for option D (str)
     :return:
+    question: the full formatted question, with answer options (str)
     """
     question = f"QUESTION: {q}\n\tA: {a}\n\tB: {b}\n\tC: {c}\n\tD: {d}"
     return question
@@ -140,8 +148,8 @@ def print_MC(q, a, b, c, d):
 
 def ask_MC():
     """
-    kjhgjlhg
-    :return:
+    asks user for answer to multiple choice question (A, B, C or D)
+    :return: user input (str)
     """
     while True:
         ans = input("Enter 'A', 'B', 'C' or 'D' to indicate your answer: ").upper()
@@ -163,13 +171,18 @@ def ask_MC():
 
 def process_MC (q, actual, x, y, z):
     """
-    jkhgjhggj
-    :param q:
-    :param actual:
-    :param x:
-    :param y:
-    :param z:
+    processes MC question
+    :param q: question being asked, without options (str)
+    :param actual: correct answer (str)
+    :param x: wrong answer 1 (str)
+    :param y: wrong answer 2 (str)
+    :param z: wrong answer 3 (str)
     :return:
+    question: the full formatted question, with options (str)
+    given: answer indicated by user (str)
+    is_correct: bool stating whether given answer is correct
+    GIVEN: letter answer provided by user (str)
+    ACTUAL: letter corresponding to correct answer (str)
     """
     dict, ACTUAL = mix_MC(actual, x, y, z)
     a, b, c, d = dict.values()
@@ -192,7 +205,7 @@ def find_opts(df, cat_filter, val, flip=False):
     :param cat_filter: category used to filter
     :param val: values in filter category
     :param flip: if filtering by cat_want != val
-    :return: series with filter applied
+    :return: dataframe with filter applied
     """
     if not flip:
         return df[df[cat_filter] == val]
