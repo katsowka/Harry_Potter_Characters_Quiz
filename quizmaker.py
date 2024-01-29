@@ -1,4 +1,5 @@
-# test of custom module
+# module for making and processing True or False (TF)
+# and Multiple Choice (MC) questions
 
 import random as rd
 
