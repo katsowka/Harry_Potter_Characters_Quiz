@@ -358,8 +358,10 @@ txt_correct = "Correct!"
 txt_wrong = "Incorrect!"
 
 # for writing files
-today = datetime.datetime.now()
-date_short = today.strftime("%d-%m-%Y")
+now = datetime.datetime.now()
+now_short = now.strftime("%d-%m-%Y, %H:%M")
+date_short = now.strftime("%d-%m-%Y")
+
 qs_txt = f"\t\t\t~~*~** Harry Potter Quiz: Your Questions and Answers **~*~~ \n\ndate: {date_short}\n\n"
 
 
