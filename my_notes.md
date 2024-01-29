@@ -2,10 +2,11 @@
 
 TO DO NEXT:
 - plan and make leaderboard:
-  - use pandas or numpy to sort
+  - use pandas too cumbersome when adding rows - just csv as before, or try numpy?
   - is leaderboard.csv needed? (in addition to scores.csv)
 
 TO DO:
+- save question stats for each set of rounds played?
 - implement OOP?
 - see Jupyter TO DO
 - add a 'correct' variable in TFs, so instead of T or F, it gives the correct 'answer'
