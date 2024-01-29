@@ -1,13 +1,11 @@
 # My Notes
 
 TO DO NEXT:
-- is check_ans still required? (error text made external)
 - plan and make leaderboard:
   - use pandas or numpy to sort
   - is leaderboard.csv needed? (in addition to scores.csv)
 
 TO DO:
-- make custom module for MC questions?
 - implement OOP?
 - see Jupyter TO DO
 - add a 'correct' variable in TFs, so instead of T or F, it gives the correct 'answer'
