@@ -1,12 +1,13 @@
 # My Notes
 
 TO DO NEXT:
+- check out gameplay from work wEmma
 - plan and make leaderboard:
   - use pandas too cumbersome when adding rows - just csv as before, or try numpy?
   - is leaderboard.csv needed? (in addition to scores.csv)
 
 TO DO:
-- save question stats for each set of rounds played?
+- save question stats for each set of rounds played? (qtext, character, iscorrect)
 - implement OOP?
 - see Jupyter TO DO
 - add a 'correct' variable in TFs, so instead of T or F, it gives the correct 'answer'
