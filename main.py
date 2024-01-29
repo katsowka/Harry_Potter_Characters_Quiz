@@ -53,6 +53,9 @@ alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
 alts_remaining = alts.sample(frac=1)
 
+df_scores = pd.DataFrame(columns=['Date', 'Username', 'Rounds', 'Score'])
+
+
 # ----- HELPER FUNCTIONS
 
 # -- dataframe related
