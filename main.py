@@ -43,7 +43,7 @@ wand_woods = [ x for x in df['wand.wood'].unique() if x != '']
 wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 
 
-##### TEMOPORARY SHORT DF
+##### TEMPORARY SHORT DF
 df = df.iloc[0:100]
 
 df_remaining = df.sample(frac=1)
@@ -53,6 +53,7 @@ alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
 alts_remaining = alts.sample(frac=1)
 
+### remove!
 df_scores = pd.DataFrame(columns=['Date', 'Username', 'Rounds', 'Score'])
 
 
@@ -353,6 +354,7 @@ MCqs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
 question_types = TFqs + MCqs
 # question_types = [is_alt_name]
 
+### add all print statements here? then put in list that feed into play?
 # print statements
 txt_correct = "Correct!"
 txt_wrong = "Incorrect!"
@@ -367,88 +369,97 @@ qs_txt = f"\t\t\t~~*~** Harry Potter Quiz: Your Questions and Answers **~*~~ \n\
 
 # ----- GAME PLAY
 
+def play(df, alts, question_types, qs_txt):
 
-# -- setting up rounds and questions
-# asking for number of rounds
-while True:
-    num = input("\n>>> Welcome to the Harry Potter Characters Quiz! <<< "
-                "\n\nHow many rounds would you like to play? ").strip()
-    if not num.isdigit() or int(num) not in range(1, 51):
-        print("You can play 1 to 50 rounds. Please enter a number in that range.")
-    else:
-        max_rounds = int(num)
-        break
-
-# initializing score and starting round
-score = 0
-round_ = 1
-
-# creating selection of questions
-questions = rd.choices(question_types, k=max_rounds)
-
-# -- going through questions
-for question in questions:
-
-    if round_ == max_rounds:
-        print(f"\n***** Round {round_} - Last One! *****")
-    else:
-        print(f"\n***** Round {round_} *****")
-
-    # questions requiring alternative names series
-    if question in [is_alt_name]:  # ADD MC_'alts' when done
-        if len(alts_remaining) == 0:
-            question = rd.choice([is_student, is_staff, is_wizard])
-            q, given, actual, is_correct, ind = question(df_remaining)
+    df_remaining = df.sample(frac=1)
+    alts_remaining = alts.sample(frac=1)
+    # -- setting up rounds and questions
+    # asking for number of rounds
+    while True:
+        num = input("\n>>> Welcome to the Harry Potter Characters Quiz! <<< "
+                    "\n\nHow many rounds would you like to play? ").strip()
+        if not num.isdigit() or int(num) not in range(1, 51):
+            print("You can play 1 to 50 rounds. Please enter a number in that range.")
         else:
-            q, given, actual, is_correct, ind = question(df_remaining, alts_remaining)
-
-    ### is this required? NOT if questions skipping implemented
-    # questions requiring full dataframe
-    elif question in [is_wand_wood]:
-        q, given, actual, is_correct, ind = question(df)
-
-    # standard questions
-    else:
-        ### MC qs when df_remaining is low - Add Error return!!
-        if len(df_remaining) < 10 and question in [MCqs]:
-            print("df_remaining getting low for MC!=")
+            max_rounds = int(num)
             break
-        q, given, actual, is_correct, ind = question(df_remaining)
 
-    qs_add = (f"{round_}. {q}\n\tyour answer:\t{str(given)}"
-              f"\n\tcorrect answer:\t{str(actual)}\n\n")
-    qs_txt += qs_add
+    # initializing score and starting round
+    score = 0
+    round_ = 1
 
-    if is_correct:
-        print(txt_correct)
-        score += 1
-    else:
-        print(txt_wrong)
+    # creating selection of questions
+    questions = rd.choices(question_types, k=max_rounds)
 
-    round_ += 1
+    # -- going through questions
+    for question in questions:
 
-    if ind is not None:
-        df_remaining.drop(ind, inplace=True, errors='ignore')
-        alts_remaining.drop(ind, inplace=True, errors='ignore')
+        if round_ == max_rounds:
+            print(f"\n***** Round {round_} - Last One! *****")
+        else:
+            print(f"\n***** Round {round_} *****")
 
-    if len(df_remaining) == 0:
-        print("### no chars left!!") ###
-        df_remaining = df.sample(frac=1)
-        alts_remaining = alts.sample(frac=1)
+        # questions requiring alternative names series
+        if question in [is_alt_name]:  # ADD MC_'alts' when done
+            if len(alts_remaining) == 0:
+                question = rd.choice([is_student, is_staff, is_wizard])
+                q, given, actual, is_correct, ind = question(df_remaining)
+            else:
+                q, given, actual, is_correct, ind = question(df_remaining, alts_remaining)
 
-    ###
-    # print(df_remaining['name'])
-    # print(alts_remaining)
+        ### is this required? NOT if questions skipping implemented
+        # questions requiring full dataframe
+        elif question in [is_wand_wood]:
+            q, given, actual, is_correct, ind = question(df)
+
+        # standard questions
+        else:
+            ### MC qs when df_remaining is low - Add Error return!!
+            if len(df_remaining) < 10 and question in [MCqs]:
+                print("df_remaining getting low for MC!=")
+                break
+            q, given, actual, is_correct, ind = question(df_remaining)
+
+        qs_add = (f"{round_}. {q}\n\tyour answer:\t{str(given)}"
+                  f"\n\tcorrect answer:\t{str(actual)}\n\n")
+        qs_txt += qs_add
+
+        if is_correct:
+            print(txt_correct)
+            score += 1
+        else:
+            print(txt_wrong)
+
+        round_ += 1
+
+        if ind is not None:
+            df_remaining.drop(ind, inplace=True, errors='ignore')
+            alts_remaining.drop(ind, inplace=True, errors='ignore')
+
+        if len(df_remaining) == 0:
+            print("### no chars left!!") ###
+            df_remaining = df.sample(frac=1)
+            alts_remaining = alts.sample(frac=1)
+
+        ###
+        # print(df_remaining['name'])
+        # print(alts_remaining)
 
 
-# -- after final round
+    # -- after final round
 
-end_text = f"\nYou scored {score} out of {max_rounds}."
+    end_text = f"\nYou scored {score} out of {max_rounds}."
 
-qs_txt += f"{end_text}"
+    qs_txt += f"{end_text}"
 
-print(end_text)
+    print(end_text)
 
-with open('HPquiz_qs.txt', 'w') as file:
-    file.write(qs_txt)
+    with open('HPquiz_qs.txt', 'w') as file:
+        file.write(qs_txt)
 
+
+play_quiz = True
+
+###
+# while play_quiz:
+#     play(df, alts, question_types, qs_txt)

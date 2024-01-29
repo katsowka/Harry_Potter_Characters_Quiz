@@ -1,7 +1,7 @@
 # My Notes
 
 TO DO NEXT:
-- check out gameplay from work wEmma
+- check out gameplay from work wEmma, update
 - plan and make leaderboard:
   - use pandas too cumbersome when adding rows - just csv as before, or try numpy?
   - is leaderboard.csv needed? (in addition to scores.csv)
