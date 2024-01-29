@@ -49,27 +49,12 @@ df_remaining = df.sample(frac=1)
 
 
 alts = df['alternate_names'].explode()
-alts.dropna(inplace = True)
+alts.dropna(inplace=True)
 alts_remaining = alts.sample(frac=1)
 
 # ----- HELPER FUNCTIONS
 
-# -- basic and True of False (TF) related
-
-
-def check_ans(given, actual):
-    """
-    compares the given response to the actual answer to determine if correct
-    :param given: given answer to check
-    :param actual: actual answer
-    :return: bool
-    """
-    if given == actual:
-        #print("\t>>> Correct! :D")
-        return True
-    else:
-        #print("\t>>> Sorry, wrong answer. :(")
-        return False
+# -- True or False (TF) related
 
 
 def ask_TF():
@@ -98,7 +83,7 @@ def process_TF(actual):
     is_correct: bool stating whether given answer is correct
     """
     given = ask_TF()
-    is_correct = check_ans(given, actual)
+    is_correct = given == actual
     return given, is_correct
 
 
@@ -190,7 +175,7 @@ def process_MC (q, actual, x, y, z):
     print(question)
     GIVEN = ask_MC()
     given = dict[GIVEN]
-    is_correct = check_ans(given, actual)
+    is_correct = given == actual
     return [question, given, is_correct, GIVEN, ACTUAL]
 
 
