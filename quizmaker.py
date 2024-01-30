@@ -1,7 +1,35 @@
-# module for making and processing True or False (TF)
+# module for making quizzes, including
+# writing and processing True or False (TF)
 # and Multiple Choice (MC) questions
 
 import random as rd
+
+
+# -- asking Y/N, number of rounds, username
+
+
+def ask_YN(msg = ""):
+    # asks for yes/no input until a clear answer is provided, returns choice as boolean
+    # 'msg' is optional string input to be printed before the 'Y/N:' input request
+    while True:
+        print(msg, end=" ")
+        ans = input("Y / N : ").upper()
+        if ('Y' in ans) and not ('N' in ans):
+            return True
+        elif ('N' in ans) and not ('Y' in ans):
+            return False
+        else:
+            print("Your response is not clear, try again. ")
+
+
+def ask_rounds(max_rounds=10):
+    while True:
+        num = input("How many rounds would you like to play? ").strip()
+        if not num.isdigit() or int(num) not in range(1, max_rounds+1):
+            print(f"You can play 1 to {max_rounds} rounds. Please enter a number in that range.")
+        else:
+            return int(num)
+
 
 # -- True or False (TF) related
 
