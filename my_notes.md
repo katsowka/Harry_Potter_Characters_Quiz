@@ -1,12 +1,11 @@
 # My Notes
-
 TO DO NEXT:
-- check out gameplay from work wEmma, update
+- force push this to GitHub!
 - plan and make leaderboard:
-  - use pandas too cumbersome when adding rows - just csv as before, or try numpy?
-  - is leaderboard.csv needed? (in addition to scores.csv)
+  - pandas too cumbersome when adding rows - just csv as before (NumPy overkill?)
 
 TO DO:
+- learn about [amending commits](https://www.jetbrains.com/help/pycharm/edit-project-history.html#amend-commit) 
 - save question stats for each set of rounds played? (qtext, character, iscorrect)
 - implement OOP?
 - see Jupyter TO DO
