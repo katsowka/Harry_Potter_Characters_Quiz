@@ -18,15 +18,15 @@ import random as rd
 import datetime
 import csv
 
-# importing Harry Potter characters data using API
+# -- importing Harry Potter characters data using API
 url = 'https://hp-api.onrender.com/api/characters'
 response = rq.get(url).json()
-
 df = json_normalize(response)
 
 
 # ----- ORGANIZE DATA
 
+# NAMING REFERENCE:
 # 'name', 'alternate_names', 'species', 'gender', 'house', 'wizard',
 # 'ancestry', 'patronus', 'hogwartsStudent', 'hogwartsStaff', 'actor',
 # 'alternate_actors', 'alive', 'image', 'wand.wood', 'wand.core', 'wand.length'
@@ -52,9 +52,6 @@ df_remaining = df.sample(frac=1)
 alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
 alts_remaining = alts.sample(frac=1)
-
-### remove!
-df_scores = pd.DataFrame(columns=['Date', 'Username', 'Rounds', 'Score'])
 
 
 # ----- HELPER FUNCTIONS
