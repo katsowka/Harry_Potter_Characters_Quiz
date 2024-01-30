@@ -345,6 +345,9 @@ def MC_species_1(df):
 # ----- SETTING UP FOR GAME PLAY (questions, files etc.)
 
 
+# restricting number of rounds
+max_rounds = 100
+
 # list of question types to be chosen from randomly
 TFqs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
 MCqs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
@@ -368,30 +371,24 @@ qs_txt = f"\t\t\t~~*~** Harry Potter Quiz: Your Questions and Answers **~*~~ \n\
 
 def play(df, alts, question_types, qs_txt):
 
+    # refreshing character lists
     df_remaining = df.sample(frac=1)
     alts_remaining = alts.sample(frac=1)
-    # -- setting up rounds and questions
+
     # asking for number of rounds
-    while True:
-        num = input("\n>>> Welcome to the Harry Potter Characters Quiz! <<< "
-                    "\n\nHow many rounds would you like to play? ").strip()
-        if not num.isdigit() or int(num) not in range(1, 51):
-            print("You can play 1 to 50 rounds. Please enter a number in that range.")
-        else:
-            max_rounds = int(num)
-            break
+    rounds = qm.ask_rounds(max_rounds)
+
+    # creating selection of questions
+    questions = rd.choices(question_types, k=rounds)
 
     # initializing score and starting round
     score = 0
     round_ = 1
 
-    # creating selection of questions
-    questions = rd.choices(question_types, k=max_rounds)
-
-    # -- going through questions
+    # going through questions
     for question in questions:
 
-        if round_ == max_rounds:
+        if round_ == rounds:
             print(f"\n***** Round {round_} - Last One! *****")
         else:
             print(f"\n***** Round {round_} *****")
@@ -434,7 +431,8 @@ def play(df, alts, question_types, qs_txt):
             alts_remaining.drop(ind, inplace=True, errors='ignore')
 
         if len(df_remaining) == 0:
-            print("### no chars left!!") ###
+            ###
+            print("### no chars left!!")
             df_remaining = df.sample(frac=1)
             alts_remaining = alts.sample(frac=1)
 
@@ -445,7 +443,7 @@ def play(df, alts, question_types, qs_txt):
 
     # -- after final round
 
-    end_text = f"\nYou scored {score} out of {max_rounds}."
+    end_text = f"\nYou scored {score} out of {rounds}."
 
     qs_txt += f"{end_text}"
 
@@ -455,8 +453,10 @@ def play(df, alts, question_types, qs_txt):
         file.write(qs_txt)
 
 
-play_quiz = True
+while True:
+    play(df, alts, question_types, qs_txt)
+    play_again = qm.ask_YN("\nWould you like to play again?")
+    if not play_again:
+        print("Goodbye!")
+        break
 
-###
-# while play_quiz:
-#     play(df, alts, question_types, qs_txt)
