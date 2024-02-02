@@ -273,9 +273,9 @@ def MC_staff_1(df):
     opts = find_opts(df, 'hogwartsStaff', False).sample(frac=1)
     x, y, z = opts['name'].iloc[0:3].values
 
-    question, given, is_correct = qm.process_MC(q, actual, x, y, z)[0:3]
+    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL]
 
 
 def MC_student_1(df):
@@ -288,9 +288,9 @@ def MC_student_1(df):
     opts = find_opts(df, 'hogwartsStudent', False).sample(frac=1)
     x, y, z = opts['name'].iloc[0:3].values
 
-    question, given, is_correct = qm.process_MC(q, actual, x, y, z)[0:3]
+    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL]
 
 
 def MC_house_1(df):
@@ -304,9 +304,9 @@ def MC_house_1(df):
 
     q = f"Which of the following characters is in {house} house?"
 
-    question, given, is_correct = qm.process_MC(q, actual, x, y, z)[0:3]
+    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL]
 
 
 def MC_house_2(df):
@@ -317,9 +317,9 @@ def MC_house_2(df):
     actual = char['house']
     x, y, z = rd.sample([x for x in houses if x != actual], k=3)
 
-    question, given, is_correct = qm.process_MC(q, actual, x, y, z)[0:3]
+    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL]
 
 
 # needs FULL df?
@@ -331,9 +331,9 @@ def MC_species_1(df):
     actual = char['species']
     x, y, z = rd.sample([x for x in species if x != actual], k=3)
 
-    question, given, is_correct = qm.process_MC(q, actual, x, y, z)[0:3]
+    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL]
 
 
 # ----- SETTING UP FOR GAME PLAY (questions, files etc.)
@@ -345,7 +345,7 @@ max_rounds = 100
 # list of question types to be chosen from randomly
 TFqs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
 MCqs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
-question_types =  MCqs # +TFqs
+question_types =  MCqs + TFqs
 # question_types = [is_student]
 
 ### add all print statements here? then put in list that feed into play?
@@ -358,7 +358,7 @@ now = datetime.datetime.now()
 now_short = now.strftime("%d-%m-%Y, %H:%M")
 date_short = now.strftime("%d-%m-%Y")
 
-qs_txt = f"\t\t\t~~*~** Harry Potter Quiz: Your Questions and Answers **~*~~ \n\ndate: {date_short}\n\n"
+qs_intro = f"\t\t\t~~*~** Harry Potter Quiz: Your Questions and Answers **~*~~ \n\ndate: {date_short}\n\n"
 
 
 # ----- GAME PLAY
@@ -378,6 +378,9 @@ def play(df, alts, question_types, qs_txt):
     # initializing score and starting round
     score = 0
     round_ = 1
+
+    # intitializing questions file
+    qs_txt = qs_intro
 
     # going through questions
     for question in questions:
@@ -400,16 +403,25 @@ def play(df, alts, question_types, qs_txt):
         elif question in [is_wand_wood]:
             q, given, actual, is_correct, ind = question(df)
 
-        # standard questions
-        else:
+        # MC questions
+        elif question in MCqs:
             ### MC qs when df_remaining is low - Add Error return!!
             if len(df_remaining) < 10 and question in [MCqs]:
+                ###
                 print("df_remaining getting low for MC!=")
                 break
+            q, given, actual, is_correct, ind, GIVEN, ACTUAL = question(df_remaining)
+
+        else:
             q, given, actual, is_correct, ind = question(df_remaining)
 
-        qs_add = (f"{round_}. {q}\n\tyour answer:\t{str(given)}"
-                  f"\n\tcorrect answer:\t{str(actual)}\n\n")
+        # adding to text file
+        if question in MCqs:
+            qs_add = (f"{round_}. {q}\n\t\tyou answered {GIVEN}: {given}"
+                      f"\n\t\tcorrect answer {ACTUAL}: {actual}\n\n")
+        else:
+            qs_add = (f"{round_}. {q}\n\t\tyou answered {str(given)}"
+                      f"\n\t\tcorrect answer {str(actual)}\n\n")
         qs_txt += qs_add
 
         if is_correct:
@@ -448,7 +460,7 @@ def play(df, alts, question_types, qs_txt):
 
 
 while True:
-    play(df, alts, question_types, qs_txt)
+    play(df, alts, question_types, qs_intro)
     play_again = qm.ask_YN("\nWould you like to play again?")
     if not play_again:
         print("Goodbye!")
