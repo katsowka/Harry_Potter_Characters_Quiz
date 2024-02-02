@@ -42,16 +42,14 @@ patronuses = [ x for x in df['patronus'].unique() if x != '']
 wand_woods = [ x for x in df['wand.wood'].unique() if x != '']
 wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 
-
-##### TEMPORARY SHORT DF
-df = df.iloc[0:100]
-
-df_remaining = df.sample(frac=1)
-
-
 alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
 alts_remaining = alts.sample(frac=1)
+
+
+##### TEMPORARY SHORT DF
+df = df.iloc[0:100]
+df_remaining = df.sample(frac=1)
 
 
 # ----- HELPER FUNCTIONS
@@ -105,14 +103,10 @@ def is_student(df):
     char = df.iloc[0]
     ind = char.name
 
-    question = f"Is {char['name']} a student at Hogwarts?"
-    print("QUESTION: " + question)
+    question = f"{char['name']} is a student at Hogwarts. True or False?"
+    print(question)
 
     actual = char['hogwartsStudent']
-    ''' old, remove if fine
-    given = ask_TF()
-    is_correct = check_ans(given, actual)
-    '''
     given, is_correct = qm.process_TF(actual)
 
     return [question, given, actual, is_correct, ind]
@@ -127,8 +121,8 @@ def is_staff(df):
     char = df.iloc[0]
     ind = char.name
 
-    question = f"Is {char['name']} a staff member at Hogwarts?"
-    print("QUESTION: " + question)
+    question = f"{char['name']} a staff member at Hogwarts. True or False?"
+    print(question)
 
     actual = char['hogwartsStaff']
     given, is_correct = qm.process_TF(actual)
@@ -145,8 +139,8 @@ def is_wizard(df):
     char = df.iloc[0]
     ind = char.name
 
-    question = f"Is {char['name']} a wizard?"
-    print("QUESTION: " + question)
+    question = f"{char['name']} a wizard. True or False?"
+    print(question)
 
     actual = char['wizard']
     given, is_correct = qm.process_TF(actual)
@@ -165,8 +159,8 @@ def is_house(df):
 
     rand_house = rd.choice(houses + [char['house']])  # 2 in 5 chance correct
 
-    question = f"Is {char['name']} in {rand_house} house?"
-    print("QUESTION: " + question)
+    question = f"Is {char['name']} in {rand_house} house. True or False?"
+    print(question)
 
     actual = char['house'] == rand_house
     given, is_correct = qm.process_TF(actual)
@@ -185,8 +179,8 @@ def is_patronus(df):
 
     rand_patronus = rd.choice(rd.sample(patronuses, k=3) + [char['patronus']])
 
-    question = f"{char['name']}'s patronus is a/an: {rand_patronus}"
-    print("QUESTION: " + question)
+    question = f"{char['name']}'s patronus is a/an {rand_patronus}. True or False?"
+    print(question)
 
     actual = char['patronus'] == rand_patronus
     given, is_correct = qm.process_TF(actual)
@@ -205,8 +199,8 @@ def is_species(df):
 
     rand_species = rd.choice(rd.sample(species, k=3) + [char['species']])
 
-    question = f"{char['name']} belongs to the species: {rand_species}"
-    print("QUESTION: " + question)
+    question = f"{char['name']} belongs to the {rand_species} species. True or False?"
+    print(question)
 
     actual = char['species'] == rand_species
     given, is_correct = qm.process_TF(actual)
@@ -228,8 +222,8 @@ def is_alt_name(df, alts):
 
     rand_alt_name = rd.choice([rd.choice(alts.values), alt_name])
 
-    question = f"One of {char['name']}'s alternate names is: {rand_alt_name}"
-    print("QUESTION: " + question)
+    question = f"One of {char['name']}'s alternate names is {rand_alt_name}. True or False?"
+    print(question)
 
     actual = rand_alt_name in char['alternate_names']
     given, is_correct = qm.process_TF(actual)
@@ -251,8 +245,8 @@ def is_wand_wood(df):
     other_wand_wood = rd.choice(wand_woods)
     rand_wand_wood = rd.choice([other_wand_wood, char['wand.wood']])
 
-    question = f"The wood type of {char['name']}'s wand is: {rand_wand_wood}"
-    print("QUESTION: " + question)
+    question = f"{char['name']}'s wand is made of {rand_wand_wood}. True or False?"
+    print(question)
 
     actual = rand_wand_wood == char['wand.wood']
     given, is_correct = qm.process_TF(actual)
@@ -351,8 +345,8 @@ max_rounds = 100
 # list of question types to be chosen from randomly
 TFqs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
 MCqs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
-question_types = TFqs + MCqs
-# question_types = [is_alt_name]
+question_types =  MCqs # +TFqs
+# question_types = [is_student]
 
 ### add all print statements here? then put in list that feed into play?
 # print statements
