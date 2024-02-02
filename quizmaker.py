@@ -49,7 +49,7 @@ def ask_TF():
     :return: bool
     """
     while True:
-        ans = input("Enter 'T' for True or 'F' for false: ").upper()
+        ans = input("Enter 'T' for True or 'F' for False: ").upper()
         if ('T' in ans) and not ('F' in ans):
             ### print("YOUR ANSWER: True")
             return True
