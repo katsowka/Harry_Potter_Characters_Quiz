@@ -22,6 +22,15 @@ def ask_YN(msg = ""):
             print("Your response is not clear, try again. ")
 
 
+def ask_username(max_chars=10):
+    while True:
+        username = input("Enter a username: ").strip()
+        if len(username) > max_chars:
+            print(f"The username should be less than {max_chars} characters long.")
+        else:
+            return username
+
+
 def ask_rounds(max_rounds=10):
     while True:
         num = input("How many rounds would you like to play? ").strip()
@@ -42,10 +51,10 @@ def ask_TF():
     while True:
         ans = input("Enter 'T' for True or 'F' for false: ").upper()
         if ('T' in ans) and not ('F' in ans):
-            print("YOUR ANSWER: True")
+            ### print("YOUR ANSWER: True")
             return True
         elif ('F' in ans) and not ('T' in ans):
-            print("YOUR ANSWER: False")
+            ### print("YOUR ANSWER: False")
             return False
         else:
             print("Your response is not clear, try again. ")
@@ -107,7 +116,7 @@ def print_MC(q, a, b, c, d):
     :return:
     question: the full formatted question, with answer options (str)
     """
-    question = f"QUESTION: {q}\n\tA: {a}\n\tB: {b}\n\tC: {c}\n\tD: {d}"
+    question = f"{q}\n\tA: {a}\n\tB: {b}\n\tC: {c}\n\tD: {d}"
     return question
 
 
@@ -119,16 +128,16 @@ def ask_MC():
     while True:
         ans = input("Enter 'A', 'B', 'C' or 'D' to indicate your answer: ").upper()
         if (('A' in ans) and not (('B' or 'C' or 'D') in ans)):
-            print("YOUR ANSWER: A")
+            ### print("YOUR ANSWER: A")
             return 'A'
         elif (('B' in ans) and not (('A' or 'C' or 'D') in ans)):
-            print("YOUR ANSWER: B")
+            ### print("YOUR ANSWER: B")
             return 'B'
         elif (('C' in ans) and not (('B' or 'A' or 'D') in ans)):
-            print("YOUR ANSWER: C")
+            ### print("YOUR ANSWER: C")
             return 'C'
         elif (('D' in ans) and not (('B' or 'C' or 'A') in ans)):
-            print("YOUR ANSWER: D")
+            ### print("YOUR ANSWER: D")
             return 'D'
         else:
             print("Your response is not clear, try again. ")
@@ -157,3 +166,4 @@ def process_MC(q, actual, x, y, z):
     given = dict[GIVEN]
     is_correct = given == actual
     return [question, given, is_correct, GIVEN, ACTUAL]
+
