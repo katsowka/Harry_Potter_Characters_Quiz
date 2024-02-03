@@ -90,10 +90,10 @@ def log_score(file, date, score, rounds):
     try:
         data = read_csv(file)
         data.append(new_data)
-        write_csv(file, field_names, data)
+        write_csv(file, score_field_names, data)
     # if the file doesn't exist
     except (IOError, FileNotFoundError):
-        write_csv(file, field_names, [new_data])
+        write_csv(file, score_field_names, [new_data])
 
 
 # -- dataframe related
@@ -393,8 +393,9 @@ date_short = now.strftime("%d-%m-%Y")
 
 # for writing files
 score_file = "scores.csv"
-field_names = ['Date', 'Username', 'Score', 'Rounds', 'Percent']
 lb_file = "leaderboard.csv"
+score_field_names = ['Date', 'Username', 'Score', 'Rounds', 'Percent']
+
 qs_file = "HPquiz_qs.txt"
 
 
@@ -503,10 +504,15 @@ def play(df, alts, question_types, qs_txt):
     # generating questions file
     with open(qs_file, 'w') as file:
         file.write(qs_txt)
-    print(f"\nSee the file {qs_file} if you'd like to see your questions and answers.")
+    print(f"\nSee the file {qs_file} if you'd like to see your questions and answers.\n")
 
     # logging score
-    log_score(score_file, date_short, score, rounds)
+    if rounds >=5:
+        save_score = qm.ask_YN("Would you like to save your score?")
+        if save_score:
+            log_score(score_file, date_short, score, rounds)
+    else:
+        print("If you play 5 or more rounds you have a chance to appear on the leaderboard!")
 
 
 # ----- body
