@@ -409,6 +409,9 @@ qs_intro = f"\t\t\t~~*~** Harry Potter Quiz: Your Questions and Answers **~*~~ \
 # restricting number of rounds
 max_rounds = 100
 
+# other custom variables
+show_answer = True
+
 
 # ----- GAME PLAY AND LEADERBOARD
 
@@ -466,12 +469,16 @@ def play(df, alts, question_types, qs_txt):
 
         # adding to text file
         if question in MCqs:
-            qs_add = (f"{round_}. {q}\n\t\tyou answered - {GIVEN}: {given}"
-                      f"\n\t\tcorrect answer - {ACTUAL}: {actual}\n\n")
+            qs_txt += f"{round_}. {q}\n\t\tyou answered {GIVEN}: {given} - "
+            if is_correct:
+                qs_txt += (txt_correct + "\n\n")
+            else:
+                qs_txt += (txt_wrong
+                           + f"\n\t\tcorrect answer is {ACTUAL}: {actual}\n\n")
         else:
-            qs_add = (f"{round_}. {q}\n\t\tyou answered - {str(given)}"
-                      f"\n\t\tcorrect answer - {str(actual)}\n\n")
-        qs_txt += qs_add
+            qs_txt += (f"{round_}. {q}\n\t\tyou answered {str(given)} - "
+                       + (txt_correct if is_correct else txt_wrong) + "\n\n")
+
 
         if is_correct:
             print(txt_correct)
