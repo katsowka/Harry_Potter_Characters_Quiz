@@ -54,6 +54,48 @@ df_remaining = df.sample(frac=1)
 
 # ----- HELPER FUNCTIONS
 
+
+# -- file related
+
+
+def read_csv(file):
+    # opens csv file and reads in the data as a dictionary
+    with open(file, 'r') as csv_file:
+        object = csv.DictReader(csv_file)
+        data = []
+        for row in object: # each row is a dictionary
+            data.append(row)
+    return data # list of dictionaries
+
+
+def write_csv(file, field_names, data):
+    # saves data to existing file
+    with open(file, 'w') as csv_file:
+        object = csv.DictWriter(csv_file,
+                                fieldnames=field_names,
+                                lineterminator='\n')
+        object.writeheader()
+        object.writerows(data)
+
+
+def log_score(file, date, score, rounds):
+    # adds the new score data to a csv file if it exists,
+    # otherwise it creates a new file to store the data
+    username = qm.ask_username(10)
+    new_data = {'Date': date,
+                'Username': username,
+                'Score': score,
+                'Rounds': rounds,
+                'Percent': round(score/rounds*100, 1)}
+    try:
+        data = read_csv(file)
+        data.append(new_data)
+        write_csv(file, field_names, data)
+    # if the file doesn't exist
+    except (IOError, FileNotFoundError):
+        write_csv(file, field_names, [new_data])
+
+
 # -- dataframe related
 
 
@@ -338,27 +380,32 @@ def MC_species_1(df):
 
 # ----- SETTING UP FOR GAME PLAY (questions, files etc.)
 
-
-# restricting number of rounds
-max_rounds = 100
-
 # list of question types to be chosen from randomly
 TFqs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
 MCqs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
 question_types =  MCqs + TFqs
 # question_types = [is_student]
 
-### add all print statements here? then put in list that feed into play?
-# print statements
-txt_correct = "Correct!"
-txt_wrong = "Incorrect!"
-
-# for writing files
+# date and time formats
 now = datetime.datetime.now()
 now_short = now.strftime("%d-%m-%Y, %H:%M")
 date_short = now.strftime("%d-%m-%Y")
 
+# for writing files
+score_file = "scores.csv"
+field_names = ['Date', 'Username', 'Score', 'Rounds', 'Percent']
+lb_file = "leaderboard.csv"
+qs_file = "HPquiz_qs.txt"
+
+
+### add all print statements here? then put in list that feed into play?
+# print statements
+txt_correct = "Correct!"
+txt_wrong = "Incorrect!"
 qs_intro = f"\t\t\t~~*~** Harry Potter Quiz: Your Questions and Answers **~*~~ \n\ndate: {date_short}\n\n"
+
+# restricting number of rounds
+max_rounds = 100
 
 
 # ----- GAME PLAY
@@ -429,7 +476,6 @@ def play(df, alts, question_types, qs_txt):
             score += 1
         else:
             print(txt_wrong)
-
         round_ += 1
 
         if ind is not None:
@@ -450,13 +496,17 @@ def play(df, alts, question_types, qs_txt):
     # -- after final round
 
     end_text = f"\nYou scored {score} out of {rounds}."
-
     qs_txt += f"{end_text}"
-
     print(end_text)
 
-    with open('HPquiz_qs.txt', 'w') as file:
+    with open(qs_file, 'w') as file:
         file.write(qs_txt)
+    print(f"\nSee the file {qs_file} if you'd like to see your questions and answers.")
+
+    log_score(score_file, date_short, score, rounds)
+
+
+# ----- body
 
 
 while True:
