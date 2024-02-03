@@ -417,11 +417,11 @@ def play(df, alts, question_types, qs_txt):
 
         # adding to text file
         if question in MCqs:
-            qs_add = (f"{round_}. {q}\n\t\tyou answered {GIVEN}: {given}"
-                      f"\n\t\tcorrect answer {ACTUAL}: {actual}\n\n")
+            qs_add = (f"{round_}. {q}\n\t\tyou answered - {GIVEN}: {given}"
+                      f"\n\t\tcorrect answer - {ACTUAL}: {actual}\n\n")
         else:
-            qs_add = (f"{round_}. {q}\n\t\tyou answered {str(given)}"
-                      f"\n\t\tcorrect answer {str(actual)}\n\n")
+            qs_add = (f"{round_}. {q}\n\t\tyou answered - {str(given)}"
+                      f"\n\t\tcorrect answer - {str(actual)}\n\n")
         qs_txt += qs_add
 
         if is_correct:
