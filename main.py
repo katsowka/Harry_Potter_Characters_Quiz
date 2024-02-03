@@ -96,6 +96,7 @@ def log_score(file, date, score, rounds):
         write_csv(file, score_field_names, [new_data])
 
 
+
 # -- dataframe related
 
 
@@ -409,7 +410,7 @@ qs_intro = f"\t\t\t~~*~** Harry Potter Quiz: Your Questions and Answers **~*~~ \
 max_rounds = 100
 
 
-# ----- GAME PLAY
+# ----- GAME PLAY AND LEADERBOARD
 
 def play(df, alts, question_types, qs_txt):
 
@@ -515,11 +516,37 @@ def play(df, alts, question_types, qs_txt):
         print("If you play 5 or more rounds you have a chance to appear on the leaderboard!")
 
 
+def leaderboard():
+    data = read_csv(score_file)
+
+    # converting to integers
+    for each in data:
+        each['Rounds'] = int(each['Rounds'])
+        each['Percent'] = float(each['Percent'])
+
+
+    # sorting
+    sorted_data = sorted(sorted(data, key=lambda x: x['Rounds'], reverse=True),
+                         key=lambda x: x['Percent'], reverse=True)
+    lb_data = sorted_data[:min(10, len(sorted_data))]
+
+    # saving file
+    write_csv(lb_file, score_field_names, lb_data)
+
+    # for display
+    print("\n***************  LEADERBOARD  ***************\n")
+    for x in range(len(lb_data)):
+        print(f"{x + 1:3}: {lb_data[x]['Username']:12} "
+              f"Score: {lb_data[x]['Score']} / {lb_data[x]['Rounds']} "
+              f"= {lb_data[x]['Percent']} %\n")
+
+
 # ----- body
 
 
 while True:
     play(df, alts, question_types, qs_intro)
+    leaderboard()
     play_again = qm.ask_YN("\nWould you like to play again?")
     if not play_again:
         print("Goodbye!")
