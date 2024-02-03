@@ -495,14 +495,17 @@ def play(df, alts, question_types, qs_txt):
 
     # -- after final round
 
+    # generating end text
     end_text = f"\nYou scored {score} out of {rounds}."
     qs_txt += f"{end_text}"
     print(end_text)
 
+    # generating questions file
     with open(qs_file, 'w') as file:
         file.write(qs_txt)
     print(f"\nSee the file {qs_file} if you'd like to see your questions and answers.")
 
+    # logging score
     log_score(score_file, date_short, score, rounds)
 
 
