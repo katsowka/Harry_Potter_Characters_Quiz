@@ -42,14 +42,13 @@ patronuses = [ x for x in df['patronus'].unique() if x != '']
 wand_woods = [ x for x in df['wand.wood'].unique() if x != '']
 wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 
-alts = df['alternate_names'].explode()
-alts.dropna(inplace=True)
-alts_remaining = alts.sample(frac=1)
-
-
 ##### TEMPORARY SHORT DF
 df = df.iloc[0:100]
 df_remaining = df.sample(frac=1)
+
+alts = df['alternate_names'].explode()
+alts.dropna(inplace=True)
+alts_remaining = alts.sample(frac=1)
 
 
 # ----- HELPER FUNCTIONS
@@ -78,6 +77,8 @@ def write_csv(file, field_names, data):
         object.writerows(data)
 
 
+# field names as input?
+# generalize "log" functiopns? instead of log_scores and log_stats?
 def log_score(file, date, score, rounds):
     # adds the new score data to a csv file if it exists,
     # otherwise it creates a new file to store the data
@@ -94,6 +95,23 @@ def log_score(file, date, score, rounds):
     # if the file doesn't exist
     except (IOError, FileNotFoundError):
         write_csv(file, score_field_names, [new_data])
+
+
+def log_stats(file, date, question_type, questions_txt, character, is_correct):
+    # adds the new score data to a csv file if it exists,
+    # otherwise it creates a new file to store the data
+    new_data = {'Date': date,
+                'Question.type': question_type,
+                'Question.text': questions_txt,
+                'Character.name': character,
+                'Correct': is_correct}
+    try:
+        data = read_csv(file)
+        data.append(new_data)
+        write_csv(file, stats_field_names, data)
+    # if the file doesn't exist
+    except (IOError, FileNotFoundError):
+        write_csv(file, stats_field_names, [new_data])
 
 
 
@@ -397,6 +415,9 @@ score_file = "scores.csv"
 lb_file = "leaderboard.csv"
 score_field_names = ['Date', 'Username', 'Score', 'Rounds', 'Percent']
 
+stats_file = "stats.csv"
+stats_field_names = ['Date', 'Question.type', 'Question.text', 'Character.name', 'Correct']
+
 qs_file = "HPquiz_qs.txt"
 
 
@@ -444,6 +465,7 @@ def play(df, alts, question_types, qs_txt):
 
         # questions requiring alternative names series
         if question in [is_alt_name]:  # ADD MC_'alts' when done
+            ### == 0? single name? or single list? need more than one?
             if len(alts_remaining) == 0:
                 question = rd.choice([is_student, is_staff, is_wizard])
                 q, given, actual, is_correct, ind = question(df_remaining)
@@ -467,7 +489,10 @@ def play(df, alts, question_types, qs_txt):
         else:
             q, given, actual, is_correct, ind = question(df_remaining)
 
-        # adding to text file
+        # adding to qs stats file
+        log_stats(stats_file, date_short, str(question), q, df_remaining.iloc[ind]['name'], is_correct)
+
+        # adding to qs text file
         if question in MCqs:
             qs_txt += f"{round_}. {q}\n\t\tyou answered {GIVEN}: {given} - "
             if is_correct:
@@ -478,7 +503,6 @@ def play(df, alts, question_types, qs_txt):
         else:
             qs_txt += (f"{round_}. {q}\n\t\tyou answered {str(given)} - "
                        + (txt_correct if is_correct else txt_wrong) + "\n\n")
-
 
         if is_correct:
             print(txt_correct)
@@ -524,7 +548,13 @@ def play(df, alts, question_types, qs_txt):
 
 
 def leaderboard():
-    data = read_csv(score_file)
+
+    try:
+        data = read_csv(score_file)
+    # if the file doesn't exist
+    except (IOError, FileNotFoundError):
+        print("No leaderboard yet! Here's your chance to be #1!")
+        return
 
     # converting to integers
     for each in data:
