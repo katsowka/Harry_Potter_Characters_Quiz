@@ -10,9 +10,9 @@ originally done in collaboration with Emma Jourzac (jourzy)
 
 
 import requests as rq
-import pandas as pd
+# import pandas as pd
 from pandas import json_normalize
-import numpy as np
+# import numpy as np
 import quizmaker as qm
 import random as rd
 import datetime
