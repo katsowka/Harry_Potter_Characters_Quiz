@@ -7,6 +7,8 @@ originally done in collaboration with Emma Jourzac (jourzy)
 '''
 
 # ----- IMPORT LIBRARIES AND DATA
+# <editor-fold desc="This text is shown when collapsed">
+
 
 
 import requests as rq
@@ -23,7 +25,7 @@ url = 'https://hp-api.onrender.com/api/characters'
 response = rq.get(url).json()
 df = json_normalize(response)
 
-
+# </editor-fold>
 # ----- ORGANIZE DATA
 
 # NAMING REFERENCE:
