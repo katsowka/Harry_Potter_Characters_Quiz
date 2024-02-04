@@ -6,8 +6,7 @@ based on final project of CFG Python and Apps Kickstarter course
 originally done in collaboration with Emma Jourzac (jourzy)
 '''
 
-# ----- IMPORT LIBRARIES AND DATA
-# <editor-fold desc="This text is shown when collapsed">
+# <editor-fold desc="----- IMPORT LIBRARIES AND DATA">
 
 
 
@@ -26,7 +25,9 @@ response = rq.get(url).json()
 df = json_normalize(response)
 
 # </editor-fold>
-# ----- ORGANIZE DATA
+
+
+# <editor-fold desc="----- ORGANIZE DATA">
 
 # NAMING REFERENCE:
 # 'name', 'alternate_names', 'species', 'gender', 'house', 'wizard',
@@ -51,9 +52,10 @@ df_remaining = df.sample(frac=1)
 alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
 alts_remaining = alts.sample(frac=1)
+# </editor-fold>
 
 
-# ----- HELPER FUNCTIONS
+# <editor-fold desc="----- HELPER FUNCTIONS">
 
 
 # -- file related
@@ -135,7 +137,10 @@ def find_opts(df, cat_filter, val, flip=False):
         return df[df[cat_filter] != val]
 
 
-# ----- QUESTION TYPES
+# </editor-fold>
+
+
+# <editor-fold desc="----- QUESTION TYPES">
 
 
 # each question with the following form:
@@ -398,7 +403,11 @@ def MC_species_1(df):
     return [question, given, actual, is_correct, ind, GIVEN, ACTUAL]
 
 
-# ----- SETTING UP FOR GAME PLAY (questions, files etc.)
+# </editor-fold>
+
+
+# <editor-fold desc="----- SETTING UP FOR GAME PLAY">
+
 
 # list of question types to be chosen from randomly
 TFqs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
@@ -433,9 +442,11 @@ max_rounds = 100
 
 # other custom variables
 show_answer = True
+# </editor-fold>
 
 
-# ----- GAME PLAY AND LEADERBOARD
+# <editor-fold desc="----- GAME PLAY AND LEADERBOARD">
+
 
 def play(df, alts, question_types, qs_txt):
 
@@ -578,8 +589,10 @@ def leaderboard():
               f"Score: {lb_data[x]['Score']} / {lb_data[x]['Rounds']} "
               f"= {lb_data[x]['Percent']} %\n")
 
+# </editor-fold>
 
-# ----- body
+
+# ----- BODY
 
 
 while True:
