@@ -210,7 +210,7 @@ def is_wizard(df):
     char = df.iloc[0]
     ind = char.name
 
-    question = f"{char['name']} a wizard. True or False?"
+    question = f"{char['name']} is a wizard. True or False?"
     print(question)
 
     correction = None
@@ -427,8 +427,8 @@ def MC_species_1(df):
 # list of question types to be chosen from randomly
 TFqs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
 MCqs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
-# question_types =  MCqs + TFqs
-question_types = [is_alt_name]
+question_types =  MCqs + TFqs
+# question_types = [is_alt_name]
 
 # date and time formats
 now = datetime.datetime.now()
@@ -498,8 +498,6 @@ def play(df, alts, question_types, qs_txt):
                 q, given, actual, is_correct, ind, correction = question(df_remaining)
             else:
                 q, given, actual, is_correct, ind, correction = question(df_remaining, alts_remaining)
-                ###
-                print(correction)
 
         # ### is this required? NOT if questions skipping implemented
         # # questions requiring full dataframe
@@ -513,12 +511,13 @@ def play(df, alts, question_types, qs_txt):
                 ###
                 print("df_remaining getting low for MC!=")
                 break
+
             q, given, actual, is_correct, ind, GIVEN, ACTUAL = question(df_remaining)
+            correction = None
 
         else:
             q, given, actual, is_correct, ind, correction = question(df_remaining)
-            ###
-            print(correction)
+
 
         # adding to qs stats file
         log_stats(stats_file, date_short, question.__name__, df_remaining.iloc[ind]['name'], is_correct)
@@ -538,8 +537,12 @@ def play(df, alts, question_types, qs_txt):
         if is_correct:
             print(txt_correct)
             score += 1
+
         else:
             print(txt_wrong)
+            if correction and show_answer:
+                print(correction)
+
         round_ += 1
 
         if ind is not None:
