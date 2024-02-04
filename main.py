@@ -539,8 +539,9 @@ def play(df, alts, question_types, qs_txt):
                            # + f"\n\t\tcorrect answer is {ACTUAL}: {actual}\n\n")
         else:
             qs_txt += (f"{round_}. {q}\n\t\tyou answered {str(given)} - "
-                       + (txt_correct if is_correct else txt_wrong + "\n")
-                       + "\t\t" + correction + "\n\n")
+                       + (txt_correct if is_correct else
+                          txt_wrong + "\n\t\t" + correction)
+                       + "\n\n")
 
         if is_correct:
             print(txt_correct)
