@@ -357,7 +357,9 @@ def MC_staff_1(df):
 
     question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL]
+    correction = f"The staff member at Hogwarts is {actual} (option {ACTUAL})."
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 def MC_student_1(df):
@@ -372,7 +374,9 @@ def MC_student_1(df):
 
     question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL]
+    correction = f"The student at Hogwarts is {actual} (option {ACTUAL})."
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 def MC_house_1(df):
@@ -388,7 +392,9 @@ def MC_house_1(df):
 
     question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL]
+    correction = f"The character in {house} house is {actual} (option {ACTUAL})."
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 def MC_house_2(df):
@@ -401,7 +407,9 @@ def MC_house_2(df):
 
     question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL]
+    correction = f"{char['name']} is in {actual} house (option {ACTUAL})."
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 # needs FULL df?
@@ -415,7 +423,9 @@ def MC_species_1(df):
 
     question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL]
+    correction = f"{char['name']} is a/an {actual} (option {ACTUAL})."
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 # </editor-fold>
@@ -427,8 +437,8 @@ def MC_species_1(df):
 # list of question types to be chosen from randomly
 TFqs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
 MCqs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
-question_types =  MCqs + TFqs
-# question_types = [is_alt_name]
+# question_types =  MCqs + TFqs
+question_types = MCqs
 
 # date and time formats
 now = datetime.datetime.now()
@@ -512,8 +522,8 @@ def play(df, alts, question_types, qs_txt):
                 print("df_remaining getting low for MC!=")
                 break
 
-            q, given, actual, is_correct, ind, GIVEN, ACTUAL = question(df_remaining)
-            correction = None
+            q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
+            ### correction = None
 
         else:
             q, given, actual, is_correct, ind, correction = question(df_remaining)
