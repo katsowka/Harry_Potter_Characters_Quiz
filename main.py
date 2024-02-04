@@ -173,10 +173,12 @@ def is_student(df):
     question = f"{char['name']} is a student at Hogwarts. True or False?"
     print(question)
 
+    correction = None
+
     actual = char['hogwartsStudent']
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, correction]
 
 
 def is_staff(df):
@@ -191,10 +193,12 @@ def is_staff(df):
     question = f"{char['name']} is a staff member at Hogwarts. True or False?"
     print(question)
 
+    correction = None
+
     actual = char['hogwartsStaff']
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, correction]
 
 
 def is_wizard(df):
@@ -209,10 +213,12 @@ def is_wizard(df):
     question = f"{char['name']} a wizard. True or False?"
     print(question)
 
+    correction = None
+
     actual = char['wizard']
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, correction]
 
 
 def is_house(df):
@@ -229,10 +235,12 @@ def is_house(df):
     question = f"{char['name']} is in {rand_house} house. True or False?"
     print(question)
 
+    correction = f"{char['name']} is in {char['house']} house."
+
     actual = char['house'] == rand_house
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, correction]
 
 
 def is_patronus(df):
@@ -249,10 +257,12 @@ def is_patronus(df):
     question = f"{char['name']}'s patronus is a/an {rand_patronus}. True or False?"
     print(question)
 
+    correction = f"{char['name']}'s patronus is a/an {char['patronus']}."
+
     actual = char['patronus'] == rand_patronus
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, correction]
 
 
 def is_species(df):
@@ -269,10 +279,12 @@ def is_species(df):
     question = f"{char['name']} belongs to the {rand_species} species. True or False?"
     print(question)
 
+    correction = f"{char['name']} belongs to the {char['species']} species."
+
     actual = char['species'] == rand_species
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, correction]
 
 
 def is_alt_name(df, alts):
@@ -292,10 +304,12 @@ def is_alt_name(df, alts):
     question = f"One of {char['name']}'s alternate names is {rand_alt_name}. True or False?"
     print(question)
 
+    correction = f"{char['name']}'s alternate name/s is/are: {', '.join(x for x in char['alternate_names'])}"
+
     actual = rand_alt_name in char['alternate_names']
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, correction]
 
 
 ### sample row of df returns df, need to use squeeze, better solution?
@@ -315,10 +329,11 @@ def is_wand_wood(df):
     question = f"{char['name']}'s wand is made of {rand_wand_wood}. True or False?"
     print(question)
 
+    correction = f"{char['name']}'s wand is made of {char['wand.wood']}"
     actual = rand_wand_wood == char['wand.wood']
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind]
+    return [question, given, actual, is_correct, ind, correction]
 
 
 # -- Multiple Choice (MC) types
@@ -412,8 +427,8 @@ def MC_species_1(df):
 # list of question types to be chosen from randomly
 TFqs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
 MCqs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
-question_types =  MCqs + TFqs
-# question_types = [is_student]
+# question_types =  MCqs + TFqs
+question_types = [is_alt_name]
 
 # date and time formats
 now = datetime.datetime.now()
@@ -480,14 +495,16 @@ def play(df, alts, question_types, qs_txt):
             ### == 0? single name? or single list? need more than one?
             if len(alts_remaining) == 0:
                 question = rd.choice([is_student, is_staff, is_wizard])
-                q, given, actual, is_correct, ind = question(df_remaining)
+                q, given, actual, is_correct, ind, correction = question(df_remaining)
             else:
-                q, given, actual, is_correct, ind = question(df_remaining, alts_remaining)
+                q, given, actual, is_correct, ind, correction = question(df_remaining, alts_remaining)
+                ###
+                print(correction)
 
-        ### is this required? NOT if questions skipping implemented
-        # questions requiring full dataframe
-        elif question in [is_wand_wood]:
-            q, given, actual, is_correct, ind = question(df)
+        # ### is this required? NOT if questions skipping implemented
+        # # questions requiring full dataframe
+        # elif question in [is_wand_wood]:
+        #     q, given, actual, is_correct, ind, correction = question(df)
 
         # MC questions
         elif question in MCqs:
@@ -499,7 +516,9 @@ def play(df, alts, question_types, qs_txt):
             q, given, actual, is_correct, ind, GIVEN, ACTUAL = question(df_remaining)
 
         else:
-            q, given, actual, is_correct, ind = question(df_remaining)
+            q, given, actual, is_correct, ind, correction = question(df_remaining)
+            ###
+            print(correction)
 
         # adding to qs stats file
         log_stats(stats_file, date_short, question.__name__, df_remaining.iloc[ind]['name'], is_correct)
