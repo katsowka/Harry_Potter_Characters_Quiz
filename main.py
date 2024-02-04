@@ -9,7 +9,6 @@ originally done in collaboration with Emma Jourzac (jourzy)
 # <editor-fold desc="----- IMPORT LIBRARIES AND DATA">
 
 
-
 import requests as rq
 import pandas as pd
 from pandas import json_normalize
@@ -173,7 +172,7 @@ def is_student(df):
     question = f"{char['name']} is a student at Hogwarts. True or False?"
     print(question)
 
-    correction = None
+    correction = ""
 
     actual = char['hogwartsStudent']
     given, is_correct = qm.process_TF(actual)
@@ -193,7 +192,7 @@ def is_staff(df):
     question = f"{char['name']} is a staff member at Hogwarts. True or False?"
     print(question)
 
-    correction = None
+    correction = ""
 
     actual = char['hogwartsStaff']
     given, is_correct = qm.process_TF(actual)
@@ -213,7 +212,7 @@ def is_wizard(df):
     question = f"{char['name']} is a wizard. True or False?"
     print(question)
 
-    correction = None
+    correction = ""
 
     actual = char['wizard']
     given, is_correct = qm.process_TF(actual)
@@ -329,7 +328,7 @@ def is_wand_wood(df):
     question = f"{char['name']}'s wand is made of {rand_wand_wood}. True or False?"
     print(question)
 
-    correction = f"{char['name']}'s wand is made of {char['wand.wood']}"
+    correction = f"{char['name']}'s wand is made of {char['wand.wood']}."
     actual = rand_wand_wood == char['wand.wood']
     given, is_correct = qm.process_TF(actual)
 
@@ -437,8 +436,8 @@ def MC_species_1(df):
 # list of question types to be chosen from randomly
 TFqs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
 MCqs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
-# question_types =  MCqs + TFqs
-question_types = MCqs
+question_types =  MCqs + TFqs
+# question_types = MCqs
 
 # date and time formats
 now = datetime.datetime.now()
@@ -482,14 +481,12 @@ def play(df, alts, question_types, qs_txt):
     # asking for number of rounds
     rounds = qm.ask_rounds(max_rounds)
 
-    # creating selection of questions
+    # creating random selection of question types
     questions = rd.choices(question_types, k=rounds)
 
-    # initializing score and starting round
+    # initializing items
     score = 0
     round_ = 1
-
-    # intitializing questions file
     qs_txt = qs_intro
 
     # going through questions
@@ -523,7 +520,6 @@ def play(df, alts, question_types, qs_txt):
                 break
 
             q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
-            ### correction = None
 
         else:
             q, given, actual, is_correct, ind, correction = question(df_remaining)
@@ -538,11 +534,13 @@ def play(df, alts, question_types, qs_txt):
             if is_correct:
                 qs_txt += (txt_correct + "\n\n")
             else:
-                qs_txt += (txt_wrong
-                           + f"\n\t\tcorrect answer is {ACTUAL}: {actual}\n\n")
+                qs_txt += (txt_wrong + "\n"
+                           + "\t\t" + correction + "\n\n")
+                           # + f"\n\t\tcorrect answer is {ACTUAL}: {actual}\n\n")
         else:
             qs_txt += (f"{round_}. {q}\n\t\tyou answered {str(given)} - "
-                       + (txt_correct if is_correct else txt_wrong) + "\n\n")
+                       + (txt_correct if is_correct else txt_wrong + "\n")
+                       + "\t\t" + correction + "\n\n")
 
         if is_correct:
             print(txt_correct)
@@ -550,24 +548,20 @@ def play(df, alts, question_types, qs_txt):
 
         else:
             print(txt_wrong)
-            if correction and show_answer:
+            if show_answer:
                 print(correction)
 
         round_ += 1
 
+        ### ind is never None? take out if?
+        # dropping used character and refreshing character lists if needed
         if ind is not None:
             df_remaining.drop(ind, inplace=True, errors='ignore')
             alts_remaining.drop(ind, inplace=True, errors='ignore')
 
         if len(df_remaining) == 0:
-            ###
-            print("### no chars left!!")
             df_remaining = df.sample(frac=1)
             alts_remaining = alts.sample(frac=1)
-
-        ###
-        # print(df_remaining['name'])
-        # print(alts_remaining)
 
 
     # -- after final round
@@ -582,8 +576,8 @@ def play(df, alts, question_types, qs_txt):
         file.write(qs_txt)
     print(f"\nSee the file {qs_file} if you'd like to see your questions and answers.\n")
 
-    # logging score
-    if rounds >=5:
+    # logging score is 5 or more rounds
+    if rounds >= 5:
         save_score = qm.ask_YN("Would you like to save your score?")
         if save_score:
             log_score(score_file, date_short, score, rounds)
@@ -606,7 +600,7 @@ def leaderboard():
         each['Percent'] = float(each['Percent'])
 
 
-    # sorting
+    # sorting and trimming to max 10 rows
     sorted_data = sorted(sorted(data, key=lambda x: x['Rounds'], reverse=True),
                          key=lambda x: x['Percent'], reverse=True)
     lb_data = sorted_data[:min(10, len(sorted_data))]
@@ -624,7 +618,7 @@ def leaderboard():
 # </editor-fold>
 
 
-# ----- BODY
+# ----- MAIN
 
 
 while True:
