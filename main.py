@@ -188,7 +188,7 @@ def is_staff(df):
     char = df.iloc[0]
     ind = char.name
 
-    question = f"{char['name']} a staff member at Hogwarts. True or False?"
+    question = f"{char['name']} is a staff member at Hogwarts. True or False?"
     print(question)
 
     actual = char['hogwartsStaff']
@@ -226,7 +226,7 @@ def is_house(df):
 
     rand_house = rd.choice(houses + [char['house']])  # 2 in 5 chance correct
 
-    question = f"Is {char['name']} in {rand_house} house. True or False?"
+    question = f"{char['name']} is in {rand_house} house. True or False?"
     print(question)
 
     actual = char['house'] == rand_house
