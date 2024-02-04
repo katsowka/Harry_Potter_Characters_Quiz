@@ -116,6 +116,22 @@ def log_stats(file, date, question_type, character, is_correct):
         write_csv(file, stats_field_names, [new_data])
 
 
+def update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GIVEN = None):
+    if question in MCqs:
+        qs_txt += f"{round_}. {q}\n\t\tyou answered {GIVEN}: {given} - "
+        if is_correct:
+            qs_txt += txt_correct + "\n\n"
+        else:
+            qs_txt += txt_wrong + "\n\t\t" + correction + "\n\n"
+
+    else:
+        qs_txt += f"{round_}. {q}\n\t\tyou answered {str(given)} - "
+        if is_correct:
+            qs_txt += txt_correct + "\n\n"
+        else:
+            qs_txt += txt_wrong + "\n\t\t" + correction + "\n\n"
+
+    return qs_txt
 
 # -- dataframe related
 
@@ -177,7 +193,9 @@ def is_student(df):
     actual = char['hogwartsStudent']
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind, correction]
+    ACTUAL, GIVEN = None, None
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 def is_staff(df):
@@ -197,7 +215,9 @@ def is_staff(df):
     actual = char['hogwartsStaff']
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind, correction]
+    ACTUAL, GIVEN = None, None
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 def is_wizard(df):
@@ -217,7 +237,9 @@ def is_wizard(df):
     actual = char['wizard']
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind, correction]
+    ACTUAL, GIVEN = None, None
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 def is_house(df):
@@ -239,7 +261,9 @@ def is_house(df):
     actual = char['house'] == rand_house
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind, correction]
+    ACTUAL, GIVEN = None, None
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 def is_patronus(df):
@@ -261,7 +285,9 @@ def is_patronus(df):
     actual = char['patronus'] == rand_patronus
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind, correction]
+    ACTUAL, GIVEN = None, None
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 def is_species(df):
@@ -283,7 +309,9 @@ def is_species(df):
     actual = char['species'] == rand_species
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind, correction]
+    ACTUAL, GIVEN = None, None
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 def is_alt_name(df, alts):
@@ -308,7 +336,9 @@ def is_alt_name(df, alts):
     actual = rand_alt_name in char['alternate_names']
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind, correction]
+    ACTUAL, GIVEN = None, None
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 ### sample row of df returns df, need to use squeeze, better solution?
@@ -329,10 +359,13 @@ def is_wand_wood(df):
     print(question)
 
     correction = f"{char['name']}'s wand is made of {char['wand.wood']}."
+
     actual = rand_wand_wood == char['wand.wood']
     given, is_correct = qm.process_TF(actual)
 
-    return [question, given, actual, is_correct, ind, correction]
+    ACTUAL, GIVEN = None, None
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
 # -- Multiple Choice (MC) types
@@ -436,8 +469,11 @@ def MC_species_1(df):
 # list of question types to be chosen from randomly
 TFqs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
 MCqs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
-question_types =  MCqs + TFqs
-# question_types = MCqs
+alts_qs = [is_alt_name]
+unrestricted_qs = [is_student, is_staff, is_wizard, MC_species_1]
+restricted_qs = [x for x in (TFqs + MCqs) if x not in unrestricted_qs]
+# question_types =  MCqs + TFqs
+question_types = restricted_qs
 
 # date and time formats
 now = datetime.datetime.now()
@@ -454,7 +490,6 @@ stats_field_names = ['Date', 'Question.type', 'Character.name', 'Correct']
 
 qs_file = "HPquiz_qs.txt"
 
-
 ### add all print statements here? then put in list that feed into play?
 # print statements
 txt_correct = "Correct!"
@@ -466,6 +501,7 @@ max_rounds = 100
 
 # other custom variables
 show_answer = True
+
 # </editor-fold>
 
 
@@ -474,7 +510,7 @@ show_answer = True
 
 def play(df, alts, question_types, qs_txt):
 
-    # refreshing character lists
+    # creating shuffled character lists
     df_remaining = df.sample(frac=1)
     alts_remaining = alts.sample(frac=1)
 
@@ -502,9 +538,9 @@ def play(df, alts, question_types, qs_txt):
             ### == 0? single name? or single list? need more than one?
             if len(alts_remaining) == 0:
                 question = rd.choice([is_student, is_staff, is_wizard])
-                q, given, actual, is_correct, ind, correction = question(df_remaining)
+                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
             else:
-                q, given, actual, is_correct, ind, correction = question(df_remaining, alts_remaining)
+                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining, alts_remaining)
 
         # ### is this required? NOT if questions skipping implemented
         # # questions requiring full dataframe
@@ -522,26 +558,27 @@ def play(df, alts, question_types, qs_txt):
             q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
         else:
-            q, given, actual, is_correct, ind, correction = question(df_remaining)
+            q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
 
         # adding to qs stats file
         log_stats(stats_file, date_short, question.__name__, df_remaining.iloc[ind]['name'], is_correct)
 
         # adding to qs text file
-        if question in MCqs:
-            qs_txt += f"{round_}. {q}\n\t\tyou answered {GIVEN}: {given} - "
-            if is_correct:
-                qs_txt += (txt_correct + "\n\n")
-            else:
-                qs_txt += (txt_wrong + "\n"
-                           + "\t\t" + correction + "\n\n")
-                           # + f"\n\t\tcorrect answer is {ACTUAL}: {actual}\n\n")
-        else:
-            qs_txt += (f"{round_}. {q}\n\t\tyou answered {str(given)} - "
-                       + (txt_correct if is_correct else
-                          txt_wrong + "\n\t\t" + correction)
-                       + "\n\n")
+        update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GIVEN)
+        # if question in MCqs:
+        #     qs_txt += f"{round_}. {q}\n\t\tyou answered {GIVEN}: {given} - "
+        #     if is_correct:
+        #         qs_txt += (txt_correct + "\n\n")
+        #     else:
+        #         qs_txt += (txt_wrong + "\n"
+        #                    + "\t\t" + correction + "\n\n")
+        #                    # + f"\n\t\tcorrect answer is {ACTUAL}: {actual}\n\n")
+        # else:
+        #     qs_txt += (f"{round_}. {q}\n\t\tyou answered {str(given)} - "
+        #                + (txt_correct if is_correct else
+        #                   txt_wrong + "\n\t\t" + correction)
+        #                + "\n\n")
 
         if is_correct:
             print(txt_correct)
@@ -555,6 +592,7 @@ def play(df, alts, question_types, qs_txt):
         round_ += 1
 
         ### ind is never None? take out if?
+        ### why ignore errors in df_ramaining?
         # dropping used character and refreshing character lists if needed
         if ind is not None:
             df_remaining.drop(ind, inplace=True, errors='ignore')
