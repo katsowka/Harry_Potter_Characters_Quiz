@@ -97,12 +97,11 @@ def log_score(file, date, score, rounds):
         write_csv(file, score_field_names, [new_data])
 
 
-def log_stats(file, date, question_type, questions_txt, character, is_correct):
+def log_stats(file, date, question_type, character, is_correct):
     # adds the new score data to a csv file if it exists,
     # otherwise it creates a new file to store the data
     new_data = {'Date': date,
                 'Question.type': question_type,
-                'Question.text': questions_txt,
                 'Character.name': character,
                 'Correct': is_correct}
     try:
@@ -416,7 +415,7 @@ lb_file = "leaderboard.csv"
 score_field_names = ['Date', 'Username', 'Score', 'Rounds', 'Percent']
 
 stats_file = "stats.csv"
-stats_field_names = ['Date', 'Question.type', 'Question.text', 'Character.name', 'Correct']
+stats_field_names = ['Date', 'Question.type', 'Character.name', 'Correct']
 
 qs_file = "HPquiz_qs.txt"
 
@@ -490,7 +489,7 @@ def play(df, alts, question_types, qs_txt):
             q, given, actual, is_correct, ind = question(df_remaining)
 
         # adding to qs stats file
-        log_stats(stats_file, date_short, str(question), q, df_remaining.iloc[ind]['name'], is_correct)
+        log_stats(stats_file, date_short, question.__name__, df_remaining.iloc[ind]['name'], is_correct)
 
         # adding to qs text file
         if question in MCqs:
