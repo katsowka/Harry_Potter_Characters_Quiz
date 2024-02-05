@@ -45,7 +45,7 @@ wand_woods = [ x for x in df['wand.wood'].unique() if x != '']
 wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 
 ##### TEMPORARY SHORT DF
-df = df.iloc[0:25]
+df = df.iloc[0:12]
 
 alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
@@ -153,6 +153,39 @@ def find_opts(df, cat_filter, val, flip=False):
         return df[df[cat_filter] == val]
     else:
         return df[df[cat_filter] != val]
+
+
+# -- game related??
+
+def try_another_q (df_remaining, question_types, question):
+
+    print(f">>> INSIDE try_another:\n\n"
+          f"question_types: {[question.__name__ for question in question_types]}\n"
+          f"offending question: {question.__name__}\n\n"
+          "df_remaining['name']:\n\n",
+          df_remaining['name'], "\n\n")
+
+    ### (should ohly happen if forcing only a limited selection of question types
+    if len(question_types) == 1:
+        print(">>> We have a problem - only one question type left, and it's not suitable! "
+              "I'll choose one that works. :P")
+        question = rd.choice(is_student, is_staff, is_wizard)
+        q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
+        return q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction
+
+    else:
+        new_question_types = [x for x in question_types if x not in alts_qs + [question]]
+        new_question = rd.choice(new_question_types)
+        print(f"new_question_types: {[question.__name__ for question in new_question_types]}\n"
+              f"new question: {new_question.__name__}")
+
+    try:
+        q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = new_question(df_remaining)
+        return q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction
+
+    except (IndexError, ValueError):
+        print("got another error - going deeper!")
+        return try_another_q(df_remaining, new_question_types, new_question)
 
 
 # </editor-fold>
@@ -560,13 +593,8 @@ def play(df, alts, question_types, qs_txt):
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining, alts_remaining)
 
             except (IndexError, ValueError) as e:
-                #print(f">>> alt_qs: got {e} for question {question.__name__}")
-                if len(df_remaining) > 3:
-                    question = rd.choice(unrestricted_TF_qs + unrestricted_MC_qs)
-                else:
-                    question = rd.choice(unrestricted_TF_qs)
-                # print(question.__name__)
-                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
+                print(">>> trying try_another_q() !!!")
+                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = try_another_q(df_remaining, question_types, question)
 
         # 'regular' questions, only requiring characters dataframe
         else:
@@ -574,15 +602,9 @@ def play(df, alts, question_types, qs_txt):
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
             except (IndexError, ValueError) as e:
-                # print(f">>> got {e}\nfor question {question.__name__}")
-                if len(df_remaining) > 3:
-                    question = rd.choice(unrestricted_TF_qs + unrestricted_MC_qs)
-                else:
-                    question = rd.choice(unrestricted_TF_qs)
-                # print(question.__name__)
-                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
+                print(">>> trying try_another_q() !!!")
+                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = try_another_q(df_remaining, question_types, question)
 
-#        print("\n>>> to log and to drop: ", df_remaining.loc[ind]['name'], "\n") ###
 
         # adding to qs stats file
         log_stats(stats_file, date_short, question.__name__, df_remaining.loc[ind]['name'], is_correct)
