@@ -130,7 +130,9 @@ def update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GI
         if is_correct:
             qs_txt += txt_correct + "\n\n"
         else:
-            qs_txt += txt_wrong + "\n\t\t" + correction + "\n\n"
+            qs_txt += (txt_wrong
+                       + (("\n\t\t" + correction) if correction else "")
+                       + "\n\n")
 
     return qs_txt
 
@@ -492,7 +494,7 @@ restricted_qs = [x for x in all_qs if x not in (unrestricted_TF_qs + unrestricte
 
 alts_qs = [is_alt_name, MC_alt_name_1]
 
-question_types = [MC_alt_name_1]
+question_types = TF_qs
 
 # date and time formats
 now = datetime.datetime.now()
@@ -564,7 +566,7 @@ def play(df, alts, question_types, qs_txt):
                     question = rd.choice(unrestricted_TF_qs + unrestricted_MC_qs)
                 else:
                     question = rd.choice(unrestricted_TF_qs)
-                print(question.__name__)
+                # print(question.__name__)
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
         else:
@@ -577,7 +579,7 @@ def play(df, alts, question_types, qs_txt):
                     question = rd.choice(unrestricted_TF_qs + unrestricted_MC_qs)
                 else:
                     question = rd.choice(unrestricted_TF_qs)
-                print(question.__name__)
+                # print(question.__name__)
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
 #        print("\n>>> to log and to drop: ", df_remaining.loc[ind]['name'], "\n") ###
