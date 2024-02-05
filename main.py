@@ -478,7 +478,7 @@ restricted_qs = [x for x in all_qs if x not in (unrestricted_TF_qs + unrestricte
 
 alts_qs = [is_alt_name]
 
-question_types = TF_qs
+question_types = unrestricted_MC_qs
 
 # date and time formats
 now = datetime.datetime.now()
@@ -505,7 +505,7 @@ qs_intro = f"\t\t\t~~*~** Harry Potter Quiz: Your Questions and Answers **~*~~ \
 max_rounds = 100
 
 # other custom variables
-show_answer = True
+show_answer = False
 
 # </editor-fold>
 
@@ -570,20 +570,7 @@ def play(df, alts, question_types, qs_txt):
         log_stats(stats_file, date_short, question.__name__, df_remaining.loc[ind]['name'], is_correct)
 
         # adding to qs text file
-        update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GIVEN)
-        # if question in MCqs:
-        #     qs_txt += f"{round_}. {q}\n\t\tyou answered {GIVEN}: {given} - "
-        #     if is_correct:
-        #         qs_txt += (txt_correct + "\n\n")
-        #     else:
-        #         qs_txt += (txt_wrong + "\n"
-        #                    + "\t\t" + correction + "\n\n")
-        #                    # + f"\n\t\tcorrect answer is {ACTUAL}: {actual}\n\n")
-        # else:
-        #     qs_txt += (f"{round_}. {q}\n\t\tyou answered {str(given)} - "
-        #                + (txt_correct if is_correct else
-        #                   txt_wrong + "\n\t\t" + correction)
-        #                + "\n\n")
+        qs_txt = update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GIVEN)
 
         if is_correct:
             print(txt_correct)
