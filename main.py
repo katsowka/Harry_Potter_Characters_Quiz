@@ -119,7 +119,7 @@ def log_stats(file, date, question_type, character, is_correct):
 
 def update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GIVEN = None):
     if question in MC_qs:
-        qs_txt += f"{round_}. {q}\n\t\tyou answered {GIVEN}: {given} - "
+        qs_txt += f"{round_}. {q}\n\t\tyou answered {given} (option {GIVEN}) - "
         if is_correct:
             qs_txt += txt_correct + "\n\n"
         else:
