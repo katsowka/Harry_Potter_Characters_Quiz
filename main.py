@@ -45,7 +45,7 @@ wand_woods = [ x for x in df['wand.wood'].unique() if x != '']
 wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 
 ##### TEMPORARY SHORT DF
-df = df.iloc[15:25]
+df = df.iloc[5:25]
 # print("\n>>> full df:\n", df[['name', 'hogwartsStudent']])
 
 alts = df['alternate_names'].explode()
@@ -119,14 +119,14 @@ def log_stats(file, date, question_type, character, is_correct):
 
 def update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GIVEN = None):
     if question in MC_qs:
-        qs_txt += f"{round_}. {q}\n\t\tyou answered {given} (option {GIVEN}) - "
+        qs_txt += f"{round_}. {q}\n\t\tYou answered {given} (option {GIVEN}) - "
         if is_correct:
             qs_txt += txt_correct + "\n\n"
         else:
             qs_txt += txt_wrong + "\n\t\t" + correction + "\n\n"
 
     else:
-        qs_txt += f"{round_}. {q}\n\t\tyou answered {str(given)} - "
+        qs_txt += f"{round_}. {q}\n\t\tYou answered {str(given)} - "
         if is_correct:
             qs_txt += txt_correct + "\n\n"
         else:
@@ -162,7 +162,7 @@ def find_opts(df, cat_filter, val, flip=False):
 # each question with the following form:
 '''
 INPUT: 
-dataframe (shuffled list of remaining characters or full list of characters)
+dataframe (shuffled list of remaining characters)
 OR dataframe (as above) and series (of shuffled remaining alternate names) 
 
 OUTPUT:
@@ -170,8 +170,10 @@ str ('question' being asked)
 str or bool (the answer 'given' by user)
 str or bool (the 'actual' / correct answer)
 bool ('is_correct')
-int (index 'ind' to remove from characters list, None if not removing one)
-##### something for indicating error, like with insufficient data for question type
+int (index 'ind' to remove from characters list)
+str (given letter choice if MC, otherwise, None)
+str (actual letter choice if MC, otherwise, None)
+str (correction text for stating correct answer in context)
 '''
 
 # -- True or False (TF) types
@@ -181,7 +183,7 @@ def is_student(df):
     """
     asks if a given character is a Hogwarts students, True or False
     :param df: dataframe
-    :return: [question, given, actual, is_correct, ind]
+    :return: [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
     """
     char = df.iloc[0]
     ind = char.name
@@ -203,7 +205,7 @@ def is_staff(df):
     """
     asks if a given character is a Hogwarts staff member, True or False
     :param df: dataframe
-    :return: [question, given, actual, is_correct, ind]
+    :return: [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
     """
     char = df.iloc[0]
     ind = char.name
@@ -225,7 +227,7 @@ def is_wizard(df):
     """
     asks if a given character is a wizard, True or False
     :param df: dataframe
-    :return: [question, given, actual, is_correct, ind]
+    :return: [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
     """
     char = df.iloc[0]
     ind = char.name
@@ -243,11 +245,35 @@ def is_wizard(df):
     return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
+def is_species(df):
+    """
+    asks if a given character belongs to a certain species, True or False
+    :param df: dataframe
+    :return: [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    """
+    char = df.iloc[0]
+    ind = char.name
+
+    rand_species = rd.choice(rd.sample(species, k=3) + [char['species']])
+
+    question = f"{char['name']} is a/an {rand_species}. True or False?"
+    print(question)
+
+    correction = f"{char['name']} is a/an {char['species']}."
+
+    actual = rand_species == char['species']
+    given, is_correct = qm.process_TF(actual)
+
+    ACTUAL, GIVEN = None, None
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+
+
 def is_house(df):
     """
     asks if a given character belongs to a particular Hogwarts House, True or False
     :param df: dataframe
-    :return: [question, given, actual, is_correct, ind]
+    :return: [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
     """
     char = find_opts(df, 'house', '', True).iloc[0]
     ind = char.name
@@ -271,7 +297,7 @@ def is_patronus(df):
     """
     asks if a given patronus belongs to a particular wizard, True or False
     :param df: dataframe
-    :return: [question, given, actual, is_correct, ind]
+    :return: [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
     """
     char = find_opts(df, 'patronus', '', True).iloc[0]
     ind = char.name
@@ -291,36 +317,12 @@ def is_patronus(df):
     return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
-def is_species(df):
-    """
-    asks if a given patronus belongs to a particular wizard, True or False
-    :param df: dataframe
-    :return: [question, given, actual, is_correct, ind]
-    """
-    char = df.iloc[0]
-    ind = char.name
-
-    rand_species = rd.choice(rd.sample(species, k=3) + [char['species']])
-
-    question = f"{char['name']} belongs to the {rand_species} species. True or False?"
-    print(question)
-
-    correction = f"{char['name']} belongs to the {char['species']} species."
-
-    actual = char['species'] == rand_species
-    given, is_correct = qm.process_TF(actual)
-
-    ACTUAL, GIVEN = None, None
-
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
-
-
 def is_alt_name(df, alts):
     """
     asks if a given alternate name belongs to a particular wizard
     :param df: dataframe of HP characters
     :param alts: series of alternate names of HP characters
-    :return: [question, given, actual, is_correct, ind]
+    :return: [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
     """
     # asks if a given alternate name is that of a particular character, True or False
     alt_name = alts.iloc[0]
@@ -332,7 +334,7 @@ def is_alt_name(df, alts):
     question = f"One of {char['name']}'s alternate names is {rand_alt_name}. True or False?"
     print(question)
 
-    correction = f"{char['name']}'s alternate name/s is/are: {', '.join(x for x in char['alternate_names'])}"
+    correction = f"{char['name']} is also known as: {', '.join(x for x in char['alternate_names'])}"
 
     actual = rand_alt_name in char['alternate_names']
     given, is_correct = qm.process_TF(actual)
@@ -347,7 +349,7 @@ def is_wand_wood(df):
     """
     asks if a particular wood is used in a given characters wand
     :param df: dataframe of HP characters
-    :return: [question, given, actual, is_correct, ind]
+    :return: [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
     """
     # asks if a given wood type is used in a particular wizard's wand, True or False
     char = find_opts(df, 'wand.wood', '', True).sample().squeeze()
@@ -371,13 +373,12 @@ def is_wand_wood(df):
 
 # -- Multiple Choice (MC) types
 
-### MC_process returns 5 items, last 2 not used yet, so adding [0:3] to return
 
 def MC_staff_1(df):
     """
     asks which character is a staff member at Hogwarts
     :param df:
-    :return:
+    :return: [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
     """
     char = find_opts(df, 'hogwartsStaff', True).iloc[0]
     ind = char.name
@@ -445,7 +446,6 @@ def MC_house_2(df):
     return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
-# needs FULL df?
 def MC_species_1(df):
     char = find_opts(df, 'species', 'human', True).iloc[0]
     ind = char.name
@@ -461,6 +461,20 @@ def MC_species_1(df):
     return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
+def MC_alt_name_1(df, alts):
+    actual = alts.iloc[0]
+    ind = alts.index[0]
+    char = df.loc[ind]
+
+    q = f"By which name is {char['name']} also known as?"
+    x, y, z = alts[alts.index != ind].iloc[0:3].values
+
+    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
+
+    correction = f"{char['name']} is also known as: {', '.join(x for x in char['alternate_names'])}"
+
+    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+
 # </editor-fold>
 
 
@@ -468,17 +482,17 @@ def MC_species_1(df):
 
 
 # list of question types to be chosen from randomly
-TF_qs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
-MC_qs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
+TF_qs = [is_student, is_staff, is_wizard, is_species, is_house, is_patronus, is_alt_name, is_wand_wood]
+MC_qs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1, MC_alt_name_1]
 all_qs = TF_qs + MC_qs
 
-unrestricted_TF_qs = [is_student, is_staff, is_wizard]
-unrestricted_MC_qs = [MC_species_1]
+unrestricted_TF_qs = [is_student, is_staff, is_wizard, is_species]
+unrestricted_MC_qs = []
 restricted_qs = [x for x in all_qs if x not in (unrestricted_TF_qs + unrestricted_MC_qs)]
 
-alts_qs = [is_alt_name]
+alts_qs = [is_alt_name, MC_alt_name_1]
 
-question_types = [MC_student_1]
+question_types = [MC_alt_name_1]
 
 # date and time formats
 now = datetime.datetime.now()
@@ -517,7 +531,7 @@ def play(df, alts, question_types, qs_txt):
 
     # creating shuffled character lists
     df_remaining = df.sample(frac=1)
-    print("\n>>> in play:\n",df_remaining[['name', 'hogwartsStudent']], "\n")
+#    print("\n>>> in play:\n",df_remaining[['name', 'house']], "\n")
     alts_remaining = alts.sample(frac=1)
 
     # asking for number of rounds
@@ -544,12 +558,13 @@ def play(df, alts, question_types, qs_txt):
             try:
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining, alts_remaining)
 
-            except (IndexError) as e:
+            except (IndexError, ValueError) as e:
                 print(f">>> alt_qs: got {e} for question {question.__name__}")
                 if len(df_remaining) > 3:
                     question = rd.choice(unrestricted_TF_qs + unrestricted_MC_qs)
                 else:
                     question = rd.choice(unrestricted_TF_qs)
+                print(question.__name__)
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
         else:
@@ -562,9 +577,10 @@ def play(df, alts, question_types, qs_txt):
                     question = rd.choice(unrestricted_TF_qs + unrestricted_MC_qs)
                 else:
                     question = rd.choice(unrestricted_TF_qs)
+                print(question.__name__)
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
-        print("\n>>> to log and to drop: ", df_remaining.loc[ind]['name'], "\n") ###
+#        print("\n>>> to log and to drop: ", df_remaining.loc[ind]['name'], "\n") ###
 
         # adding to qs stats file
         log_stats(stats_file, date_short, question.__name__, df_remaining.loc[ind]['name'], is_correct)
@@ -594,7 +610,7 @@ def play(df, alts, question_types, qs_txt):
             df_remaining = df.sample(frac=1)
             alts_remaining = alts.sample(frac=1)
 
-        print(">>> for next question:\n ", df_remaining[['name', 'hogwartsStudent']], "\n")
+#        print(">>> for next question:\n ", df_remaining[['name', 'hogwartsStaff']], "\n")
 
     # -- after final round
 
