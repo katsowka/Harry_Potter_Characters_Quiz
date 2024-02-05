@@ -45,12 +45,10 @@ wand_woods = [ x for x in df['wand.wood'].unique() if x != '']
 wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 
 ##### TEMPORARY SHORT DF
-df = df.iloc[5:25]
-# print("\n>>> full df:\n", df[['name', 'hogwartsStudent']])
+df = df.iloc[0:25]
 
 alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
-# print("\n>>> full alts:\n", alts)
 
 # </editor-fold>
 
@@ -81,8 +79,9 @@ def write_csv(file, field_names, data):
         object.writerows(data)
 
 
-# field names as input?
+
 # generalize "log" functions? instead of log_scores and log_stats?
+# then field names as input?
 def log_score(file, date, score, rounds):
     # adds the new score data to a csv file if it exists,
     # otherwise it creates a new file to store the data
@@ -135,6 +134,7 @@ def update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GI
                        + "\n\n")
 
     return qs_txt
+
 
 # -- dataframe related
 
@@ -494,7 +494,7 @@ restricted_qs = [x for x in all_qs if x not in (unrestricted_TF_qs + unrestricte
 
 alts_qs = [is_alt_name, MC_alt_name_1]
 
-question_types = TF_qs
+question_types = all_qs
 
 # date and time formats
 now = datetime.datetime.now()
@@ -533,7 +533,6 @@ def play(df, alts, question_types, qs_txt):
 
     # creating shuffled character lists
     df_remaining = df.sample(frac=1)
-#    print("\n>>> in play:\n",df_remaining[['name', 'house']], "\n")
     alts_remaining = alts.sample(frac=1)
 
     # asking for number of rounds
@@ -561,7 +560,7 @@ def play(df, alts, question_types, qs_txt):
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining, alts_remaining)
 
             except (IndexError, ValueError) as e:
-                print(f">>> alt_qs: got {e} for question {question.__name__}")
+                #print(f">>> alt_qs: got {e} for question {question.__name__}")
                 if len(df_remaining) > 3:
                     question = rd.choice(unrestricted_TF_qs + unrestricted_MC_qs)
                 else:
@@ -569,12 +568,13 @@ def play(df, alts, question_types, qs_txt):
                 # print(question.__name__)
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
+        # 'regular' questions, only requiring characters dataframe
         else:
             try:
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
             except (IndexError, ValueError) as e:
-                print(f">>> got {e}\nfor question {question.__name__}")
+                # print(f">>> got {e}\nfor question {question.__name__}")
                 if len(df_remaining) > 3:
                     question = rd.choice(unrestricted_TF_qs + unrestricted_MC_qs)
                 else:
