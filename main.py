@@ -46,7 +46,7 @@ wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 
 ##### TEMPORARY SHORT DF
 df = df.iloc[15:25]
-# print("\n>>> full df:\n", df[['name', 'alternate_names']])
+# print("\n>>> full df:\n", df[['name', 'hogwartsStudent']])
 
 alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
@@ -473,12 +473,12 @@ MC_qs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
 all_qs = TF_qs + MC_qs
 
 unrestricted_TF_qs = [is_student, is_staff, is_wizard]
-unrestricted_MC_qs = [MC_student_1, MC_staff_1, MC_species_1]
+unrestricted_MC_qs = [MC_species_1]
 restricted_qs = [x for x in all_qs if x not in (unrestricted_TF_qs + unrestricted_MC_qs)]
 
 alts_qs = [is_alt_name]
 
-question_types = unrestricted_MC_qs
+question_types = [MC_student_1]
 
 # date and time formats
 now = datetime.datetime.now()
@@ -505,7 +505,7 @@ qs_intro = f"\t\t\t~~*~** Harry Potter Quiz: Your Questions and Answers **~*~~ \
 max_rounds = 100
 
 # other custom variables
-show_answer = False
+show_answer = True
 
 # </editor-fold>
 
@@ -517,7 +517,7 @@ def play(df, alts, question_types, qs_txt):
 
     # creating shuffled character lists
     df_remaining = df.sample(frac=1)
-#    print("\n>>> in play:\n",df_remaining[['name', 'alternate_names']])
+    print("\n>>> in play:\n",df_remaining[['name', 'hogwartsStudent']], "\n")
     alts_remaining = alts.sample(frac=1)
 
     # asking for number of rounds
@@ -557,14 +557,14 @@ def play(df, alts, question_types, qs_txt):
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
             except (IndexError, ValueError) as e:
-                print(f">>> got {e} for question {question.__name__}")
+                print(f">>> got {e}\nfor question {question.__name__}")
                 if len(df_remaining) > 3:
                     question = rd.choice(unrestricted_TF_qs + unrestricted_MC_qs)
                 else:
                     question = rd.choice(unrestricted_TF_qs)
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
-#        print("\n>>> to log and to drop: ", df_remaining.loc[ind]['name'], "\n") ###
+        print("\n>>> to log and to drop: ", df_remaining.loc[ind]['name'], "\n") ###
 
         # adding to qs stats file
         log_stats(stats_file, date_short, question.__name__, df_remaining.loc[ind]['name'], is_correct)
@@ -594,6 +594,7 @@ def play(df, alts, question_types, qs_txt):
             df_remaining = df.sample(frac=1)
             alts_remaining = alts.sample(frac=1)
 
+        print(">>> for next question:\n ", df_remaining[['name', 'hogwartsStudent']], "\n")
 
     # -- after final round
 
