@@ -45,12 +45,13 @@ wand_woods = [ x for x in df['wand.wood'].unique() if x != '']
 wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 
 ##### TEMPORARY SHORT DF
-df = df.iloc[0:100]
-df_remaining = df.sample(frac=1)
+df = df.iloc[15:25]
+# print("\n>>> full df:\n", df[['name', 'alternate_names']])
 
 alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
-alts_remaining = alts.sample(frac=1)
+# print("\n>>> full alts:\n", alts)
+
 # </editor-fold>
 
 
@@ -81,7 +82,7 @@ def write_csv(file, field_names, data):
 
 
 # field names as input?
-# generalize "log" functiopns? instead of log_scores and log_stats?
+# generalize "log" functions? instead of log_scores and log_stats?
 def log_score(file, date, score, rounds):
     # adds the new score data to a csv file if it exists,
     # otherwise it creates a new file to store the data
@@ -117,7 +118,7 @@ def log_stats(file, date, question_type, character, is_correct):
 
 
 def update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GIVEN = None):
-    if question in MCqs:
+    if question in MC_qs:
         qs_txt += f"{round_}. {q}\n\t\tyou answered {GIVEN}: {given} - "
         if is_correct:
             qs_txt += txt_correct + "\n\n"
@@ -467,13 +468,17 @@ def MC_species_1(df):
 
 
 # list of question types to be chosen from randomly
-TFqs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
-MCqs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
+TF_qs = [is_student, is_staff, is_wizard, is_house, is_patronus, is_alt_name, is_wand_wood]
+MC_qs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1]
+all_qs = TF_qs + MC_qs
+
+unrestricted_TF_qs = [is_student, is_staff, is_wizard]
+unrestricted_MC_qs = [MC_student_1, MC_staff_1, MC_species_1]
+restricted_qs = [x for x in all_qs if x not in (unrestricted_TF_qs + unrestricted_MC_qs)]
+
 alts_qs = [is_alt_name]
-unrestricted_qs = [is_student, is_staff, is_wizard, MC_species_1]
-restricted_qs = [x for x in (TFqs + MCqs) if x not in unrestricted_qs]
-# question_types =  MCqs + TFqs
-question_types = restricted_qs
+
+question_types = TF_qs
 
 # date and time formats
 now = datetime.datetime.now()
@@ -512,6 +517,7 @@ def play(df, alts, question_types, qs_txt):
 
     # creating shuffled character lists
     df_remaining = df.sample(frac=1)
+#    print("\n>>> in play:\n",df_remaining[['name', 'alternate_names']])
     alts_remaining = alts.sample(frac=1)
 
     # asking for number of rounds
@@ -534,35 +540,34 @@ def play(df, alts, question_types, qs_txt):
             print(f"\n***** Round {round_} *****")
 
         # questions requiring alternative names series
-        if question in [is_alt_name]:  # ADD MC_'alts' when done
-            ### == 0? single name? or single list? need more than one?
-            if len(alts_remaining) == 0:
-                question = rd.choice([is_student, is_staff, is_wizard])
-                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
-            else:
+        if question in alts_qs:
+            try:
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining, alts_remaining)
 
-        # ### is this required? NOT if questions skipping implemented
-        # # questions requiring full dataframe
-        # elif question in [is_wand_wood]:
-        #     q, given, actual, is_correct, ind, correction = question(df)
-
-        # MC questions
-        elif question in MCqs:
-            ### MC qs when df_remaining is low - Add Error return!!
-            if len(df_remaining) < 10 and question in [MCqs]:
-                ###
-                print("df_remaining getting low for MC!=")
-                break
-
-            q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
+            except (IndexError) as e:
+                print(f">>> alt_qs: got {e} for question {question.__name__}")
+                if len(df_remaining) > 3:
+                    question = rd.choice(unrestricted_TF_qs + unrestricted_MC_qs)
+                else:
+                    question = rd.choice(unrestricted_TF_qs)
+                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
         else:
-            q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
+            try:
+                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
+            except (IndexError, ValueError) as e:
+                print(f">>> got {e} for question {question.__name__}")
+                if len(df_remaining) > 3:
+                    question = rd.choice(unrestricted_TF_qs + unrestricted_MC_qs)
+                else:
+                    question = rd.choice(unrestricted_TF_qs)
+                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
+
+#        print("\n>>> to log and to drop: ", df_remaining.loc[ind]['name'], "\n") ###
 
         # adding to qs stats file
-        log_stats(stats_file, date_short, question.__name__, df_remaining.iloc[ind]['name'], is_correct)
+        log_stats(stats_file, date_short, question.__name__, df_remaining.loc[ind]['name'], is_correct)
 
         # adding to qs text file
         update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GIVEN)
@@ -586,19 +591,19 @@ def play(df, alts, question_types, qs_txt):
 
         else:
             print(txt_wrong)
-            if show_answer:
+            if show_answer and correction:
                 print(correction)
 
         round_ += 1
 
-        ### ind is never None? take out if?
+        ### took out "if ind is not None"
         ### why ignore errors in df_ramaining?
         # dropping used character and refreshing character lists if needed
-        if ind is not None:
-            df_remaining.drop(ind, inplace=True, errors='ignore')
-            alts_remaining.drop(ind, inplace=True, errors='ignore')
+        df_remaining.drop(ind, inplace=True, errors='ignore')
+        alts_remaining.drop(ind, inplace=True, errors='ignore')
 
         if len(df_remaining) == 0:
+            print(">>> refreshing lists!")
             df_remaining = df.sample(frac=1)
             alts_remaining = alts.sample(frac=1)
 
@@ -662,7 +667,7 @@ def leaderboard():
 
 while True:
     play(df, alts, question_types, qs_intro)
-    leaderboard()
+    # leaderboard()
     play_again = qm.ask_YN("\nWould you like to play again?")
     if not play_again:
         print("Goodbye!")
