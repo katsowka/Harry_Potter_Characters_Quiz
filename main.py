@@ -45,7 +45,7 @@ wand_woods = [ x for x in df['wand.wood'].unique() if x != '']
 wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 
 ##### TEMPORARY SHORT DF
-df = df.iloc[0:12]
+df = df[0:15]
 
 alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
@@ -77,7 +77,6 @@ def write_csv(file, field_names, data):
                                 lineterminator='\n')
         object.writeheader()
         object.writerows(data)
-
 
 
 # generalize "log" functions? instead of log_scores and log_stats?
@@ -159,29 +158,29 @@ def find_opts(df, cat_filter, val, flip=False):
 
 def try_another_q (df_remaining, question_types, question):
 
-    print(f">>> INSIDE try_another:\n\n"
-          f"question_types: {[question.__name__ for question in question_types]}\n"
-          f"offending question: {question.__name__}\n\n"
-          "df_remaining['name']:\n\n",
-          df_remaining['name'], "\n\n")
+    # print(f">>> INSIDE try_another:\n\n"
+    #       f"question_types: {[question.__name__ for question in question_types]}\n"
+    #       f"offending question: {question.__name__}\n\n"
+    #       "df_remaining['name']:\n\n",
+    #       df_remaining['name'], "\n\n")
 
     ### (should ohly happen if forcing only a limited selection of question types
     if len(question_types) == 1:
-        print(">>> We have a problem - only one question type left, and it's not suitable! "
+        print(">>> only one chosen question type left, and it's not suitable! "
               "I'll choose one that works. :P")
-        question = rd.choice(is_student, is_staff, is_wizard)
-        q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
-        return q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction
+        new_question = rd.choice(unrestricted_qs)
+        q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = new_question(df_remaining)
+        return q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction, new_question
 
     else:
         new_question_types = [x for x in question_types if x not in alts_qs + [question]]
         new_question = rd.choice(new_question_types)
-        print(f"new_question_types: {[question.__name__ for question in new_question_types]}\n"
-              f"new question: {new_question.__name__}")
+        # print(f"new_question_types: {[question.__name__ for question in new_question_types]}\n"
+        #       f"new question: {new_question.__name__}")
 
     try:
         q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = new_question(df_remaining)
-        return q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction
+        return q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction, new_question
 
     except (IndexError, ValueError):
         print("got another error - going deeper!")
@@ -521,11 +520,8 @@ TF_qs = [is_student, is_staff, is_wizard, is_species, is_house, is_patronus, is_
 MC_qs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1, MC_alt_name_1]
 all_qs = TF_qs + MC_qs
 
-unrestricted_TF_qs = [is_student, is_staff, is_wizard, is_species]
-unrestricted_MC_qs = []
-restricted_qs = [x for x in all_qs if x not in (unrestricted_TF_qs + unrestricted_MC_qs)]
-
 alts_qs = [is_alt_name, MC_alt_name_1]
+unrestricted_qs = [is_student, is_staff, is_wizard, is_species]
 
 question_types = all_qs
 
@@ -594,7 +590,7 @@ def play(df, alts, question_types, qs_txt):
 
             except (IndexError, ValueError) as e:
                 print(">>> trying try_another_q() !!!")
-                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = try_another_q(df_remaining, question_types, question)
+                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction, question = try_another_q(df_remaining, question_types, question)
 
         # 'regular' questions, only requiring characters dataframe
         else:
@@ -603,7 +599,7 @@ def play(df, alts, question_types, qs_txt):
 
             except (IndexError, ValueError) as e:
                 print(">>> trying try_another_q() !!!")
-                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = try_another_q(df_remaining, question_types, question)
+                q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction, question = try_another_q(df_remaining, question_types, question)
 
 
         # adding to qs stats file
