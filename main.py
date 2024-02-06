@@ -18,6 +18,7 @@ import random as rd
 import datetime
 import csv
 
+
 # -- importing Harry Potter characters data using API
 url = 'https://hp-api.onrender.com/api/characters'
 response = rq.get(url).json()
@@ -45,7 +46,7 @@ wand_woods = [ x for x in df['wand.wood'].unique() if x != '']
 wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 
 ##### TEMPORARY SHORT DF
-df = df[0:15]
+# df = df[0:15]
 
 alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
@@ -79,8 +80,6 @@ def write_csv(file, field_names, data):
         object.writerows(data)
 
 
-# generalize "log" functions? instead of log_scores and log_stats?
-# then field names as input?
 def log_score(file, date, score, rounds):
     # adds the new score data to a csv file if it exists,
     # otherwise it creates a new file to store the data
@@ -154,20 +153,15 @@ def find_opts(df, cat_filter, val, flip=False):
         return df[df[cat_filter] != val]
 
 
-# -- game related??
+# -- game play related
 
 def try_another_q (df_remaining, question_types, question):
-
-    # print(f">>> INSIDE try_another:\n\n"
-    #       f"question_types: {[question.__name__ for question in question_types]}\n"
-    #       f"offending question: {question.__name__}\n\n"
-    #       "df_remaining['name']:\n\n",
-    #       df_remaining['name'], "\n\n")
+# finds and executes another question type that doesn't throw an error
+# (when error caused by too few characters remaining)
 
     ### (should ohly happen if forcing only a limited selection of question types
-    if len(question_types) == 1:
-        print(">>> only one chosen question type left, and it's not suitable! "
-              "I'll choose one that works. :P")
+    if len(question_types) == 0:
+        print(">>>>> chosen question types too limited, choosing from another list!")
         new_question = rd.choice(unrestricted_qs)
         q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = new_question(df_remaining)
         return q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction, new_question
@@ -175,8 +169,6 @@ def try_another_q (df_remaining, question_types, question):
     else:
         new_question_types = [x for x in question_types if x not in alts_qs + [question]]
         new_question = rd.choice(new_question_types)
-        # print(f"new_question_types: {[question.__name__ for question in new_question_types]}\n"
-        #       f"new question: {new_question.__name__}")
 
     try:
         q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = new_question(df_remaining)
@@ -213,7 +205,7 @@ str (correction text for stating correct answer in context)
 # -- True or False (TF) types
 
 
-def is_student(df):
+def is_student_1(df):
     """
     asks if a given character is a Hogwarts students, True or False
     :param df: dataframe
@@ -235,7 +227,7 @@ def is_student(df):
     return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
-def is_staff(df):
+def is_staff_1(df):
     """
     asks if a given character is a Hogwarts staff member, True or False
     :param df: dataframe
@@ -257,7 +249,7 @@ def is_staff(df):
     return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
-def is_wizard(df):
+def is_wizard_1(df):
     """
     asks if a given character is a wizard, True or False
     :param df: dataframe
@@ -279,7 +271,7 @@ def is_wizard(df):
     return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
-def is_species(df):
+def is_species_1(df):
     """
     asks if a given character belongs to a certain species, True or False
     :param df: dataframe
@@ -303,7 +295,7 @@ def is_species(df):
     return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
-def is_house(df):
+def is_house_1(df):
     """
     asks if a given character belongs to a particular Hogwarts House, True or False
     :param df: dataframe
@@ -327,7 +319,7 @@ def is_house(df):
     return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
-def is_patronus(df):
+def is_patronus_1(df):
     """
     asks if a given patronus belongs to a particular wizard, True or False
     :param df: dataframe
@@ -351,7 +343,7 @@ def is_patronus(df):
     return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
-def is_alt_name(df, alts):
+def is_alt_name_1(df, alts):
     """
     asks if a given alternate name belongs to a particular wizard
     :param df: dataframe of HP characters
@@ -378,8 +370,7 @@ def is_alt_name(df, alts):
     return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
 
 
-### sample row of df returns df, need to use squeeze, better solution?
-def is_wand_wood(df):
+def is_wand_wood_1(df):
     """
     asks if a particular wood is used in a given characters wand
     :param df: dataframe of HP characters
@@ -516,12 +507,12 @@ def MC_alt_name_1(df, alts):
 
 
 # list of question types to be chosen from randomly
-TF_qs = [is_student, is_staff, is_wizard, is_species, is_house, is_patronus, is_alt_name, is_wand_wood]
+TF_qs = [is_student_1, is_staff_1, is_wizard_1, is_species_1, is_house_1, is_patronus_1, is_alt_name_1, is_wand_wood_1]
 MC_qs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1, MC_alt_name_1]
 all_qs = TF_qs + MC_qs
 
-alts_qs = [is_alt_name, MC_alt_name_1]
-unrestricted_qs = [is_student, is_staff, is_wizard, is_species]
+alts_qs = [is_alt_name_1, MC_alt_name_1]  # require df and alts as input
+unrestricted_qs = [is_student_1, is_staff_1, is_wizard_1, is_species_1] # work just one and any character
 
 question_types = all_qs
 
@@ -575,7 +566,7 @@ def play(df, alts, question_types, qs_txt):
     round_ = 1
     qs_txt = qs_intro
 
-    # going through questions
+    # -- going through each question
     for question in questions:
 
         if round_ == rounds:
@@ -588,8 +579,7 @@ def play(df, alts, question_types, qs_txt):
             try:
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining, alts_remaining)
 
-            except (IndexError, ValueError) as e:
-                print(">>> trying try_another_q() !!!")
+            except (IndexError, ValueError):
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction, question = try_another_q(df_remaining, question_types, question)
 
         # 'regular' questions, only requiring characters dataframe
@@ -598,28 +588,22 @@ def play(df, alts, question_types, qs_txt):
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df_remaining)
 
             except (IndexError, ValueError) as e:
-                print(">>> trying try_another_q() !!!")
                 q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction, question = try_another_q(df_remaining, question_types, question)
 
-
-        # adding to qs stats file
+        # adding question to text and stats files
+        qs_txt = update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GIVEN)
         log_stats(stats_file, date_short, question.__name__, df_remaining.loc[ind]['name'], is_correct)
 
-        # adding to qs text file
-        qs_txt = update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GIVEN)
-
+        # question feedback and updating score and round
         if is_correct:
             print(txt_correct)
             score += 1
-
         else:
             print(txt_wrong)
             if show_answer and correction:
                 print(correction)
-
         round_ += 1
 
-        ### took out "if ind is not None"
         ### why ignore errors in df_ramaining?
         # dropping used character and refreshing character lists if needed
         df_remaining.drop(ind, inplace=True, errors='ignore')
@@ -629,8 +613,6 @@ def play(df, alts, question_types, qs_txt):
             print(">>> refreshing lists!")
             df_remaining = df.sample(frac=1)
             alts_remaining = alts.sample(frac=1)
-
-#        print(">>> for next question:\n ", df_remaining[['name', 'hogwartsStaff']], "\n")
 
     # -- after final round
 
@@ -644,7 +626,7 @@ def play(df, alts, question_types, qs_txt):
         file.write(qs_txt)
     print(f"\nSee the file {qs_file} if you'd like to see your questions and answers.\n")
 
-    # logging score is 5 or more rounds
+    # logging score if 5 or more rounds
     if rounds >= 5:
         save_score = qm.ask_YN("Would you like to save your score?")
         if save_score:
@@ -653,11 +635,10 @@ def play(df, alts, question_types, qs_txt):
         print("If you play 5 or more rounds you have a chance to appear on the leaderboard!")
 
 
-def leaderboard():
-
+def leaderboard(N=10):
+    # creates a top N leaderboard (default is top 10) from scores file
     try:
         data = read_csv(score_file)
-    # if the file doesn't exist
     except (IOError, FileNotFoundError):
         print("No leaderboard yet! Here's your chance to be #1!")
         return
@@ -667,21 +648,21 @@ def leaderboard():
         each['Rounds'] = int(each['Rounds'])
         each['Percent'] = float(each['Percent'])
 
-
-    # sorting and trimming to max 10 rows
+    # sorting and trimming to max N rows
     sorted_data = sorted(sorted(data, key=lambda x: x['Rounds'], reverse=True),
                          key=lambda x: x['Percent'], reverse=True)
-    lb_data = sorted_data[:min(10, len(sorted_data))]
+    lb_data = sorted_data[:min(N, len(sorted_data))]
 
     # saving file
     write_csv(lb_file, score_field_names, lb_data)
 
-    # for display
+    # displaying
     print("\n***************  LEADERBOARD  ***************\n")
     for x in range(len(lb_data)):
         print(f"{x + 1:3}: {lb_data[x]['Username']:12} "
               f"Score: {lb_data[x]['Score']} / {lb_data[x]['Rounds']} "
               f"= {lb_data[x]['Percent']} %\n")
+
 
 # </editor-fold>
 
@@ -691,7 +672,7 @@ def leaderboard():
 
 while True:
     play(df, alts, question_types, qs_intro)
-    # leaderboard()
+    leaderboard()
     play_again = qm.ask_YN("\nWould you like to play again?")
     if not play_again:
         print("Goodbye!")
