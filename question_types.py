@@ -95,6 +95,31 @@ correction:  str (correction text for stating correct answer in context)
 # -- True or False (TF) types
 
 
+def is_character(df, char_type):
+    """
+    asks if a given character is a Hogwarts students, True or False
+    :param df: dataframe
+    :return: [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    """
+    char = df.iloc[0]
+    ind = char.name
+
+    question = f"{char['name']} is a student at Hogwarts. True or False?"
+    print(question)
+
+    correction = ""
+
+    actual = char['hogwartsStudent']
+    given, is_correct = qm.process_TF(actual)
+
+    ACTUAL, GIVEN = None, None
+
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
+
+
+
 def is_student_1(df):
     """
     asks if a given character is a Hogwarts students, True or False
@@ -427,14 +452,12 @@ def MC_alt_name_1(df, alts):
 
 ### My Questions:
 '''
-- can the questions be put in a module? (with dataframes)
-
-- how to simplify the output of questions?
-   [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+can I use OOP to create a class 'question_type', based on parent class 'function'?
+   all question types are functions
+   they all have the same input
+   they all have the same form of output
+   (BUT they all use the input differently to generate output)
    
-   - a tuple / dictionary? (like a template version?)
-   
-   - OR make question types into objects? (two types? since two types of input?)
    so class will be Q_type (with function as parent class?), 
    and each instance is a specific question type?
 
@@ -445,8 +468,6 @@ class Q_type(function):
                             ??? = type? (MC or TF) - helpful, but not necessary
                                 the outputs?? 
         self.type = type
-
-
 '''
 
 # question = is_wand_wood_1
