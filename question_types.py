@@ -445,27 +445,21 @@ class Q_type(function):
 
 '''
 
-question = is_wand_wood_1
-# q, given,  = ""
-# given = ""
-#
-# out = (q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
-
-#q_out = {"q":"", "given":"", "actual":"", "is_correct": True, "ind":0, "GIVEN":"", "ACTUAL":"", "correction":""}
+# question = is_wand_wood_1
 
 # list of question types for reference
-TF_qs = [is_student_1, is_staff_1, is_wizard_1, is_species_1, is_house_1, is_patronus_1, is_alt_name_1, is_wand_wood_1]
-MC_qs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1, MC_alt_name_1]
-alts_qs = [is_alt_name_1, MC_alt_name_1]  # require df and alts as input
-question_types = TF_qs + MC_qs
-
-
-
-
-
-for question in question_types:
-    if question in alts_qs:
-        q_out = question(df, alts)
-    else:
-        q_out = question(df)
-    print(f"is_correct: {q_out['is_correct']}")
+# TF_qs = [is_student_1, is_staff_1, is_wizard_1, is_species_1, is_house_1, is_patronus_1, is_alt_name_1, is_wand_wood_1]
+# MC_qs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1, MC_alt_name_1]
+# alts_qs = [is_alt_name_1, MC_alt_name_1]  # require df and alts as input
+# question_types = TF_qs + MC_qs
+#
+#
+#
+#
+#
+# for question in question_types:
+#     if question in alts_qs:
+#         q_out = question(df, alts)
+#     else:
+#         q_out = question(df)
+#     print(f"is_correct: {q_out['is_correct']}")
