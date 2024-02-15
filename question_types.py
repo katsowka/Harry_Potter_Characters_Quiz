@@ -1,7 +1,7 @@
 
 # <editor-fold desc="----- IMPORT LIBRARIES AND DATA">
 
-
+from HP_char_type import HP_char_type as ct
 import requests as rq
 from pandas import json_normalize
 import quizmaker as qm
@@ -103,13 +103,27 @@ def is_character(df, char_type):
     """
     char = df.iloc[0]
     ind = char.name
+    char_type_name = ""
+    if char_type == ct.STUDENT:
+        char_type_name = "student"
+    elif char_type == ct.STAFF:
+        char_type_name = "staff"
+    else:
+        char_type_name = "none"
 
-    question = f"{char['name']} is a student at Hogwarts. True or False?"
+    question = f"{char['name']} is a {char_type_name} at Hogwarts. True or False?"
     print(question)
 
     correction = ""
 
-    actual = char['hogwartsStudent']
+    actual = False
+    if char_type == ct.STUDENT:
+        actual = char['hogwartsStudent']
+    elif char_type == ct.STAFF:
+        actual = char['hogwartsStaff']
+    else:
+        actual = False
+
     given, is_correct = qm.process_TF(actual)
 
     ACTUAL, GIVEN = None, None

@@ -7,7 +7,7 @@ originally done in collaboration with Emma Jourzac (jourzy)
 '''
 
 # <editor-fold desc="----- IMPORT LIBRARIES">
-import HP_char_type as ct
+from HP_char_type import HP_char_type as ct # from file name import class
 import random as rd
 import datetime
 import csv
@@ -133,7 +133,7 @@ def try_another_q (df_remaining, question_types, question):
 
 
 # list of question types to be chosen from randomly
-TF_qs = [qt.is_character(ct.HP_char_type.STUDENT), qt.is_staff_1, qt.is_wizard_1, qt.is_species_1, qt.is_house_1, qt.is_patronus_1, qt.is_alt_name_1, qt.is_wand_wood_1]
+TF_qs = [qt.is_character(qt.df, ct.STUDENT), qt.is_character(qt.df, ct.STAFF), qt.is_wizard_1, qt.is_species_1, qt.is_house_1, qt.is_patronus_1, qt.is_alt_name_1, qt.is_wand_wood_1]
 # TF_qs = [qt.is_student_1, qt.is_staff_1, qt.is_wizard_1, qt.is_species_1, qt.is_house_1, qt.is_patronus_1, qt.is_alt_name_1, qt.is_wand_wood_1]
 MC_qs = [qt.MC_student_1, qt.MC_staff_1, qt.MC_house_1, qt.MC_house_2, qt.MC_species_1, qt.MC_alt_name_1]
 all_qs = TF_qs + MC_qs
@@ -141,7 +141,7 @@ all_qs = TF_qs + MC_qs
 alts_qs = [qt.is_alt_name_1, qt.MC_alt_name_1]  # require df and alts as input
 unrestricted_qs = [qt.is_student_1, qt.is_staff_1, qt.is_wizard_1, qt.is_species_1] # work on just one and any character
 
-question_types = all_qs
+question_types = [qt.is_character(qt.df, ct.STUDENT), qt.is_character(qt.df, ct.STAFF)]
 
 # date and time formats
 now = datetime.datetime.now()
@@ -305,7 +305,7 @@ while True:
         print("Goodbye!")
         break
 
-# q_out = qt.MC_house_1(qt.df)
+# q_out = qt.is_character(qt.df, ct.STUDENT )
 # print(f"is_correct: {q_out['is_correct']}")
 
 # for question in question_types:
