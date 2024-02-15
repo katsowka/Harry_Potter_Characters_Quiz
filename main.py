@@ -78,21 +78,21 @@ def log_stats(file, date, question_type, character, is_correct):
         write_csv(file, stats_field_names, [new_data])
 
 
-def update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GIVEN = None):
+def update_qs_txt(qs_txt, round_, question, q_out):
     if question in MC_qs:
-        qs_txt += f"{round_}. {q}\n\t\tYou answered {given} (option {GIVEN}) - "
-        if is_correct:
+        qs_txt += f'{round_}. {q_out["question"]}\n\t\tYou answered {q_out["given"]} (option {q_out["GIVEN"]}) - '
+        if q_out["is_correct"]:
             qs_txt += txt_correct + "\n\n"
         else:
-            qs_txt += txt_wrong + "\n\t\t" + correction + "\n\n"
+            qs_txt += txt_wrong + "\n\t\t" + q_out["correction"] + "\n\n"
 
     else:
-        qs_txt += f"{round_}. {q}\n\t\tYou answered {str(given)} - "
-        if is_correct:
+        qs_txt += f'{round_}. {q_out["question"]}\n\t\tYou answered {str(q_out["given"])} - '
+        if q_out["is_correct"]:
             qs_txt += txt_correct + "\n\n"
         else:
             qs_txt += (txt_wrong
-                       + (("\n\t\t" + correction) if correction else "")
+                       + (("\n\t\t" + q_out["correction"]) if q_out["correction"] else "")
                        + "\n\n")
 
     return qs_txt
@@ -217,8 +217,8 @@ def play(df, alts, question_types, qs_txt):
                 q_out = try_another_q(df_remaining, question_types, question)
 
         # adding question to text and stats files
-        qs_txt = update_qs_txt(qs_txt, round_, q_out)
-        # log_stats(stats_file, date_short, question.__name__, df_remaining.loc[ind]['name'], is_correct)
+        qs_txt = update_qs_txt(qs_txt, round_, question, q_out)
+        log_stats(stats_file, date_short, question.__name__, df_remaining.loc[q_out["ind"]]['name'], q_out["is_correct"])
 
         # question feedback and updating score and round
         if q_out["is_correct"]:
@@ -248,17 +248,17 @@ def play(df, alts, question_types, qs_txt):
     print(end_text)
 
     # generating questions file
-    # with open(qs_file, 'w') as file:
-    #     file.write(qs_txt)
-    # print(f"\nSee the file {qs_file} if you'd like to see your questions and answers.\n")
-    #
-    # # logging score if 5 or more rounds
-    # if rounds >= 5:
-    #     save_score = qm.ask_YN("Would you like to save your score?")
-    #     if save_score:
-    #         log_score(score_file, date_short, score, rounds)
-    # else:
-    #     print("If you play 5 or more rounds you have a chance to appear on the leaderboard!")
+    with open(qs_file, 'w') as file:
+        file.write(qs_txt)
+    print(f"\nSee the file {qs_file} if you'd like to see your questions and answers.\n")
+
+    # logging score if 5 or more rounds
+    if rounds >= 5:
+        save_score = qm.ask_YN("Would you like to save your score?")
+        if save_score:
+            log_score(score_file, date_short, score, rounds)
+    else:
+        print("If you play 5 or more rounds you have a chance to appear on the leaderboard!")
 
 
 def leaderboard(N=10):
@@ -298,7 +298,7 @@ def leaderboard(N=10):
 
 while True:
     play(qt.df, qt.alts, question_types, qs_intro)
-    # leaderboard()
+    leaderboard()
     play_again = qm.ask_YN("\nWould you like to play again?")
     if not play_again:
         print("Goodbye!")

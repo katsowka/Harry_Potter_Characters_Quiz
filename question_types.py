@@ -30,6 +30,10 @@ wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
 
+##### TEMPORARY SHORT DF
+
+df = df[0:20]
+
 
 # </editor-fold>
 
