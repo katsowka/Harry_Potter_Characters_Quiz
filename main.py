@@ -217,7 +217,7 @@ def play(df, alts, question_types, qs_txt):
                 q_out = try_another_q(df_remaining, question_types, question)
 
         # adding question to text and stats files
-        # qs_txt = update_qs_txt(qs_txt, round_, question, q, given, is_correct, correction, GIVEN)
+        qs_txt = update_qs_txt(qs_txt, round_, q_out)
         # log_stats(stats_file, date_short, question.__name__, df_remaining.loc[ind]['name'], is_correct)
 
         # question feedback and updating score and round
