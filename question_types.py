@@ -3,13 +3,9 @@
 
 
 import requests as rq
-# import pandas as pd
 from pandas import json_normalize
-# import numpy as np
 import quizmaker as qm
 import random as rd
-import datetime
-import csv
 
 
 # -- importing Harry Potter characters data using API
@@ -57,6 +53,18 @@ def find_opts(df, cat_filter, val, flip=False):
         return df[df[cat_filter] != val]
 
 
+def make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction):
+    q_out = {"question": question,
+                "given": given,
+                "actual": actual,
+                "is_correct": is_correct,
+                "ind": ind,
+                "GIVEN": GIVEN,
+                "ACTUAL": ACTUAL,
+                "correction": correction}
+    return q_out
+
+
 # </editor-fold>
 
 
@@ -102,7 +110,9 @@ def is_student_1(df):
 
     ACTUAL, GIVEN = None, None
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 def is_staff_1(df):
@@ -124,7 +134,9 @@ def is_staff_1(df):
 
     ACTUAL, GIVEN = None, None
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 def is_wizard_1(df):
@@ -146,7 +158,9 @@ def is_wizard_1(df):
 
     ACTUAL, GIVEN = None, None
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 def is_species_1(df):
@@ -170,7 +184,9 @@ def is_species_1(df):
 
     ACTUAL, GIVEN = None, None
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 def is_house_1(df):
@@ -194,7 +210,9 @@ def is_house_1(df):
 
     ACTUAL, GIVEN = None, None
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 def is_patronus_1(df):
@@ -218,7 +236,9 @@ def is_patronus_1(df):
 
     ACTUAL, GIVEN = None, None
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 def is_alt_name_1(df, alts):
@@ -245,7 +265,9 @@ def is_alt_name_1(df, alts):
 
     ACTUAL, GIVEN = None, None
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 def is_wand_wood_1(df):
@@ -271,7 +293,9 @@ def is_wand_wood_1(df):
 
     ACTUAL, GIVEN = None, None
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 # -- Multiple Choice (MC) types
@@ -296,7 +320,9 @@ def MC_staff_1(df):
 
     correction = f"The staff member at Hogwarts is {actual} (option {ACTUAL})."
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 def MC_student_1(df):
@@ -313,7 +339,9 @@ def MC_student_1(df):
 
     correction = f"The student at Hogwarts is {actual} (option {ACTUAL})."
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 def MC_house_1(df):
@@ -331,7 +359,9 @@ def MC_house_1(df):
 
     correction = f"The character in {house} house is {actual} (option {ACTUAL})."
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 def MC_house_2(df):
@@ -346,7 +376,9 @@ def MC_house_2(df):
 
     correction = f"{char['name']} is in {actual} house (option {ACTUAL})."
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 def MC_species_1(df):
@@ -361,7 +393,9 @@ def MC_species_1(df):
 
     correction = f"{char['name']} is a/an {actual} (option {ACTUAL})."
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 def MC_alt_name_1(df, alts):
@@ -376,7 +410,9 @@ def MC_alt_name_1(df, alts):
 
     correction = f"{char['name']} is also known as: {', '.join(x for x in char['alternate_names'])}"
 
-    return [question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction]
+    q_out = make_q_out(question, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+
+    return q_out
 
 
 # </editor-fold>
@@ -395,20 +431,27 @@ def MC_alt_name_1(df, alts):
    - a tuple / dictionary? (like a template version?)
    
    - OR make question types into objects? (two types? since two types of input?)
+   so class will be Q_type (with function as parent class?), 
+   and each instance is a specific question type?
+
+if OOP:
 
 class Q_type(function):
-    def __init__(self, ??? ): ??? data for making question?
-                            ??? = type? (MC or TF)
+    def __init__(self, ??? ): ??? data for making question? OR outputs?
+                            ??? = type? (MC or TF) - helpful, but not necessary
+                                the outputs?? 
         self.type = type
 
 
 '''
 
-question = is_student_1
-q, given,  = ""
-given = ""
+question = is_wand_wood_1
+# q, given,  = ""
+# given = ""
+#
+# out = (q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
 
-out = (q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
+#q_out = {"q":"", "given":"", "actual":"", "is_correct": True, "ind":0, "GIVEN":"", "ACTUAL":"", "correction":""}
 
 # list of question types for reference
 TF_qs = [is_student_1, is_staff_1, is_wizard_1, is_species_1, is_house_1, is_patronus_1, is_alt_name_1, is_wand_wood_1]
@@ -416,8 +459,8 @@ MC_qs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1, MC_alt_
 alts_qs = [is_alt_name_1, MC_alt_name_1]  # require df and alts as input
 
 if question in alts_qs:
-    q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df, alts)
+    q_out  = question(df, alts)
 else:
-    q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction = question(df)
+    q_out = question(df)
 
-print(f"is_correct: {is_correct}")
+print(f"is_correct: {q_out['is_correct']}")
