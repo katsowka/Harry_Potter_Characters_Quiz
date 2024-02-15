@@ -32,7 +32,7 @@ alts.dropna(inplace=True)
 
 ##### TEMPORARY SHORT DF
 
-df = df[0:20]
+# df = df[0:20]
 
 
 # </editor-fold>
