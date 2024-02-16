@@ -27,6 +27,11 @@ patronuses = [ x for x in df['patronus'].unique() if x != '']
 wand_woods = [ x for x in df['wand.wood'].unique() if x != '']
 wand_cores = [ x for x in df['wand.core'].unique() if x != '']
 
+
+##### TEMPORARY SHORT DF
+#df = df[0:20]
+
+
 alts = df['alternate_names'].explode()
 alts.dropna(inplace=True)
 
@@ -91,7 +96,7 @@ correction:  str (correction text for stating correct answer in context)
 # -- True or False (TF) types
 
 
-def is_student_1(df):
+def is_student_1(df, confirm_input=False):
     """
     asks if a given character is a Hogwarts students, True or False
     :param df: dataframe
@@ -106,7 +111,7 @@ def is_student_1(df):
     correction = ""
 
     actual = char['hogwartsStudent']
-    given, is_correct = qm.process_TF(actual)
+    given, is_correct = qm.process_TF(actual, confirm_input)
 
     ACTUAL, GIVEN = None, None
 
@@ -115,7 +120,7 @@ def is_student_1(df):
     return q_out
 
 
-def is_staff_1(df):
+def is_staff_1(df, confirm_input=False):
     """
     asks if a given character is a Hogwarts staff member, True or False
     :param df: dataframe
@@ -130,7 +135,7 @@ def is_staff_1(df):
     correction = ""
 
     actual = char['hogwartsStaff']
-    given, is_correct = qm.process_TF(actual)
+    given, is_correct = qm.process_TF(actual, confirm_input)
 
     ACTUAL, GIVEN = None, None
 
@@ -139,7 +144,7 @@ def is_staff_1(df):
     return q_out
 
 
-def is_wizard_1(df):
+def is_wizard_1(df, confirm_input=False):
     """
     asks if a given character is a wizard, True or False
     :param df: dataframe
@@ -154,7 +159,7 @@ def is_wizard_1(df):
     correction = ""
 
     actual = char['wizard']
-    given, is_correct = qm.process_TF(actual)
+    given, is_correct = qm.process_TF(actual, confirm_input)
 
     ACTUAL, GIVEN = None, None
 
@@ -163,7 +168,7 @@ def is_wizard_1(df):
     return q_out
 
 
-def is_species_1(df):
+def is_species_1(df, confirm_input=False):
     """
     asks if a given character belongs to a certain species, True or False
     :param df: dataframe
@@ -180,7 +185,7 @@ def is_species_1(df):
     correction = f"{char['name']} is a/an {char['species']}."
 
     actual = rand_species == char['species']
-    given, is_correct = qm.process_TF(actual)
+    given, is_correct = qm.process_TF(actual, confirm_input)
 
     ACTUAL, GIVEN = None, None
 
@@ -189,7 +194,7 @@ def is_species_1(df):
     return q_out
 
 
-def is_house_1(df):
+def is_house_1(df, confirm_input=False):
     """
     asks if a given character belongs to a particular Hogwarts House, True or False
     :param df: dataframe
@@ -206,7 +211,7 @@ def is_house_1(df):
     correction = f"{char['name']} is in {char['house']} house."
 
     actual = char['house'] == rand_house
-    given, is_correct = qm.process_TF(actual)
+    given, is_correct = qm.process_TF(actual, confirm_input)
 
     ACTUAL, GIVEN = None, None
 
@@ -215,7 +220,7 @@ def is_house_1(df):
     return q_out
 
 
-def is_patronus_1(df):
+def is_patronus_1(df, confirm_input=False):
     """
     asks if a given patronus belongs to a particular wizard, True or False
     :param df: dataframe
@@ -232,7 +237,7 @@ def is_patronus_1(df):
     correction = f"{char['name']}'s patronus is a/an {char['patronus']}."
 
     actual = char['patronus'] == rand_patronus
-    given, is_correct = qm.process_TF(actual)
+    given, is_correct = qm.process_TF(actual, confirm_input)
 
     ACTUAL, GIVEN = None, None
 
@@ -241,7 +246,7 @@ def is_patronus_1(df):
     return q_out
 
 
-def is_alt_name_1(df, alts):
+def is_alt_name_1(df, alts, confirm_input=False):
     """
     asks if a given alternate name belongs to a particular wizard
     :param df: dataframe of HP characters
@@ -261,7 +266,7 @@ def is_alt_name_1(df, alts):
     correction = f"{char['name']} is also known as: {', '.join(x for x in char['alternate_names'])}"
 
     actual = rand_alt_name in char['alternate_names']
-    given, is_correct = qm.process_TF(actual)
+    given, is_correct = qm.process_TF(actual, confirm_input)
 
     ACTUAL, GIVEN = None, None
 
@@ -270,7 +275,7 @@ def is_alt_name_1(df, alts):
     return q_out
 
 
-def is_wand_wood_1(df):
+def is_wand_wood_1(df, confirm_input=False):
     """
     asks if a particular wood is used in a given characters wand
     :param df: dataframe of HP characters
@@ -289,7 +294,7 @@ def is_wand_wood_1(df):
     correction = f"{char['name']}'s wand is made of {char['wand.wood']}."
 
     actual = rand_wand_wood == char['wand.wood']
-    given, is_correct = qm.process_TF(actual)
+    given, is_correct = qm.process_TF(actual, confirm_input)
 
     ACTUAL, GIVEN = None, None
 
@@ -301,7 +306,7 @@ def is_wand_wood_1(df):
 # -- Multiple Choice (MC) types
 
 
-def MC_staff_1(df):
+def MC_staff_1(df, confirm_input=False):
     """
     asks which character is a staff member at Hogwarts
     :param df:
@@ -316,7 +321,7 @@ def MC_staff_1(df):
     opts = find_opts(df, 'hogwartsStaff', False).sample(frac=1)
     x, y, z = opts['name'].iloc[0:3].values
 
-    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
+    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z, confirm_input)
 
     correction = f"The staff member at Hogwarts is {actual} (option {ACTUAL})."
 
@@ -325,7 +330,7 @@ def MC_staff_1(df):
     return q_out
 
 
-def MC_student_1(df):
+def MC_student_1(df, confirm_input=False):
     char = find_opts(df, 'hogwartsStudent', True).iloc[0]
     ind = char.name
 
@@ -335,7 +340,7 @@ def MC_student_1(df):
     opts = find_opts(df, 'hogwartsStudent', False).sample(frac=1)
     x, y, z = opts['name'].iloc[0:3].values
 
-    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
+    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z, confirm_input)
 
     correction = f"The student at Hogwarts is {actual} (option {ACTUAL})."
 
@@ -344,7 +349,7 @@ def MC_student_1(df):
     return q_out
 
 
-def MC_house_1(df):
+def MC_house_1(df, confirm_input=False):
     house = rd.choice(houses)
     char = find_opts(df, 'house', house).iloc[0]
     ind = char.name
@@ -355,7 +360,7 @@ def MC_house_1(df):
 
     q = f"Which of the following characters is in {house} house?"
 
-    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
+    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z, confirm_input)
 
     correction = f"The character in {house} house is {actual} (option {ACTUAL})."
 
@@ -364,7 +369,7 @@ def MC_house_1(df):
     return q_out
 
 
-def MC_house_2(df):
+def MC_house_2(df, confirm_input=False):
     char = find_opts(df, 'house', '', True).iloc[0]
     ind = char.name
 
@@ -372,7 +377,7 @@ def MC_house_2(df):
     actual = char['house']
     x, y, z = rd.sample([x for x in houses if x != actual], k=3)
 
-    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
+    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z, confirm_input)
 
     correction = f"{char['name']} is in {actual} house (option {ACTUAL})."
 
@@ -381,7 +386,7 @@ def MC_house_2(df):
     return q_out
 
 
-def MC_species_1(df):
+def MC_species_1(df, confirm_input=False):
     char = find_opts(df, 'species', 'human', True).iloc[0]
     ind = char.name
 
@@ -389,7 +394,7 @@ def MC_species_1(df):
     actual = char['species']
     x, y, z = rd.sample([x for x in species if x != actual], k=3)
 
-    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
+    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z, confirm_input)
 
     correction = f"{char['name']} is a/an {actual} (option {ACTUAL})."
 
@@ -398,7 +403,7 @@ def MC_species_1(df):
     return q_out
 
 
-def MC_alt_name_1(df, alts):
+def MC_alt_name_1(df, alts, confirm_input=False):
     actual = alts.iloc[0]
     ind = alts.index[0]
     char = df.loc[ind]
@@ -406,7 +411,7 @@ def MC_alt_name_1(df, alts):
     q = f"By which name is {char['name']} also known as?"
     x, y, z = alts[alts.index != ind].iloc[0:3].values
 
-    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z)
+    question, given, is_correct, GIVEN, ACTUAL = qm.process_MC(q, actual, x, y, z, confirm_input)
 
     correction = f"{char['name']} is also known as: {', '.join(x for x in char['alternate_names'])}"
 
@@ -445,22 +450,21 @@ class Q_type(function):
 
 '''
 
-question = is_wand_wood_1
-# q, given,  = ""
-# given = ""
-#
-# out = (q, given, actual, is_correct, ind, GIVEN, ACTUAL, correction)
-
-#q_out = {"q":"", "given":"", "actual":"", "is_correct": True, "ind":0, "GIVEN":"", "ACTUAL":"", "correction":""}
+# question = is_wand_wood_1
 
 # list of question types for reference
-TF_qs = [is_student_1, is_staff_1, is_wizard_1, is_species_1, is_house_1, is_patronus_1, is_alt_name_1, is_wand_wood_1]
-MC_qs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1, MC_alt_name_1]
-alts_qs = [is_alt_name_1, MC_alt_name_1]  # require df and alts as input
-
-if question in alts_qs:
-    q_out  = question(df, alts)
-else:
-    q_out = question(df)
-
-print(f"is_correct: {q_out['is_correct']}")
+# TF_qs = [is_student_1, is_staff_1, is_wizard_1, is_species_1, is_house_1, is_patronus_1, is_alt_name_1, is_wand_wood_1]
+# MC_qs = [MC_student_1, MC_staff_1, MC_house_1, MC_house_2, MC_species_1, MC_alt_name_1]
+# alts_qs = [is_alt_name_1, MC_alt_name_1]  # require df and alts as input
+# question_types = TF_qs + MC_qs
+#
+#
+#
+#
+#
+# for question in question_types:
+#     if question in alts_qs:
+#         q_out = question(df, alts)
+#     else:
+#         q_out = question(df)
+#     print(f"is_correct: {q_out['is_correct']}")
