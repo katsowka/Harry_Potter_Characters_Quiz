@@ -100,30 +100,27 @@ def update_qs_txt(qs_txt, round_, question, q_out):
 
 # -- game play related
 
-##### put try_another in module???
 
-def try_another_q (df_remaining, question_types, question):
+def try_another_q (df_remaining, confirm_input, question_types, question):
 # finds and executes another question type that doesn't throw an error
 # (when error caused by too few characters remaining)
 
-    ### (should ohly happen if forcing only a limited selection of question types
+    ### (should only happen if forcing an overly limited selection of question types
     if len(question_types) == 0:
         print(">>>>> chosen question types too limited, choosing from another list!")
         new_question = rd.choice(unrestricted_qs)
-        q_out = new_question(df_remaining)
-        return q_out
+        return new_question(df_remaining, confirm_input)
 
     else:
         new_question_types = [x for x in question_types if x not in alts_qs + [question]]
         new_question = rd.choice(new_question_types)
 
     try:
-        q_out = new_question(df_remaining)
-        return q_out
+        return new_question(df_remaining, confirm_input)
 
     except (IndexError, ValueError):
-        print("\n\n>>>>> got another error - going deeper!")
-        return try_another_q(df_remaining, new_question_types, new_question)
+        # print("\n>>> got another error - going deeper!\n")
+        return try_another_q(df_remaining, confirm_input, new_question_types, new_question)
 
 
 # </editor-fold>
@@ -157,7 +154,6 @@ stats_field_names = ['Date', 'Question.type', 'Character.name', 'Correct']
 
 qs_file = "HPquiz_qs.txt"
 
-### add all print statements here? then put in list that feed into play?
 # print statements
 txt_correct = "Correct!"
 txt_wrong = "Incorrect!"
@@ -168,6 +164,7 @@ max_rounds = 100
 
 # other custom variables
 show_answer = True
+confirm_input = False
 
 # </editor-fold>
 
@@ -175,7 +172,7 @@ show_answer = True
 # <editor-fold desc="----- GAME PLAY AND LEADERBOARD">
 
 
-def play(df, alts, question_types, qs_txt):
+def play(df, alts, question_types, qs_intro):
 
     # creating shuffled character lists
     df_remaining = df.sample(frac=1)
@@ -203,18 +200,20 @@ def play(df, alts, question_types, qs_txt):
         # questions requiring alternative names series
         if question in alts_qs:
             try:
-                q_out = question(df_remaining, alts_remaining)
+                q_out = question(df_remaining, alts_remaining, confirm_input)
 
             except (IndexError, ValueError):
-                q_out = try_another_q(df_remaining, question_types, question)
+                # print("\n>>> using try_another_q!\n")
+                q_out = try_another_q(df_remaining, confirm_input, question_types, question)
 
         # 'regular' questions, only requiring characters dataframe
         else:
             try:
-                q_out = question(df_remaining)
+                q_out = question(df_remaining, confirm_input)
 
             except (IndexError, ValueError) as e:
-                q_out = try_another_q(df_remaining, question_types, question)
+                # print("\n>>> using try_another_q!\n")
+                q_out = try_another_q(df_remaining, confirm_input, question_types, question)
 
         # adding question to text and stats files
         qs_txt = update_qs_txt(qs_txt, round_, question, q_out)
@@ -230,7 +229,6 @@ def play(df, alts, question_types, qs_txt):
                 print(q_out["correction"])
         round_ += 1
 
-        ### why ignore errors in df_ramaining?
         # dropping used character and refreshing character lists if needed
         df_remaining.drop(q_out["ind"], inplace=True, errors='ignore')
         alts_remaining.drop(q_out["ind"], inplace=True, errors='ignore')
@@ -303,13 +301,3 @@ while True:
     if not play_again:
         print("Goodbye!")
         break
-
-# q_out = qt.MC_house_1(qt.df)
-# print(f"is_correct: {q_out['is_correct']}")
-
-# for question in question_types:
-#     if question in alts_qs:
-#         q_out = question(qt.df, qt.alts)
-#     else:
-#         q_out = question(qt.df)
-#     print(f"is_correct: {q_out['is_correct']}")
